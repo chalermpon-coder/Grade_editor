@@ -3,31 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจองวัน-เวลานิเทศชั้นเรียน</title>
+    <title>ระบบจองเวลานิเทศชั้นเรียนและบันทึกแผนการสอน</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts (Sarabun) -->
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts (Sarabun & Prompt) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Flatpickr (Calendar component) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: #f8fafc;
+            font-family: 'Prompt', 'Sarabun', sans-serif;
         }
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: #f1f5f9;
         }
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
@@ -38,249 +33,221 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- Navigation Bar -->
-    <nav class="bg-gradient-to-r from-indigo-700 via-blue-800 to-slate-900 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-white p-2 rounded-xl text-indigo-700 shadow-md">
-                        <i class="fa-solid fa-graduation-cap text-2xl"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold text-lg block leading-none">ระบบจองวัน-เวลานิเทศชั้นเรียน</span>
-                        <span class="text-xs text-indigo-200">ฝ่ายงานวิชาการและเทคโนโลยีสารสนเทศ</span>
-                    </div>
+    <!-- Header Navigation -->
+    <header class="bg-gradient-to-r from-teal-600 to-cyan-700 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm">
+                    <i data-lucide="calendar-check-2" class="w-8 h-8 text-teal-100"></i>
                 </div>
-                <div class="hidden md:flex space-x-4 items-center">
-                    <span class="bg-indigo-900/50 px-3 py-1.5 rounded-full text-xs font-medium text-indigo-200 border border-indigo-500/30">
-                        <i class="fa-solid fa-calendar-days mr-1.5 text-amber-400"></i> ช่วงเวลาจอง: 1 ก.ค. - 31 ส.ค.
-                    </span>
-                    <button onclick="scrollToSection('booking-section')" class="bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-md transform hover:-translate-y-0.5">
-                        <i class="fa-solid fa-plus mr-1"></i> จองเวลานิเทศ
-                    </button>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight">ระบบจองวัน-เวลานิเทศชั้นเรียน</h1>
+                    <p class="text-xs text-teal-100">ดึงชื่อจากชีต Teachers • บันทึกคิวลงชีต Bookings • แผนการสอนลง Google Drive</p>
                 </div>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="switchTab('booking')" id="btn-tab-booking" class="px-4 py-2 rounded-lg text-sm font-semibold transition bg-white/20 text-white shadow-sm">
+                    <i data-lucide="edit" class="w-4 h-4 inline-block mr-1.5 -mt-0.5"></i> ทำการจองนิเทศ
+                </button>
+                <button onclick="switchTab('list')" id="btn-tab-list" class="px-4 py-2 rounded-lg text-sm font-semibold transition text-teal-100 hover:bg-white/10">
+                    <i data-lucide="list" class="w-4 h-4 inline-block mr-1.5 -mt-0.5"></i> รายการจองทั้งหมด
+                </button>
+                <button onclick="openConfigModal()" class="px-3 py-2 rounded-lg text-sm font-semibold transition text-teal-100 hover:bg-white/10 border border-teal-400/30">
+                    <i data-lucide="settings" class="w-4 h-4 inline-block mr-1"></i> เชื่อมต่อระบบหลังบ้าน
+                </button>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        
-        <!-- Top Stats Banner -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl"><i class="fa-solid fa-calendar text-2xl"></i></div>
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Notification Banner / Sheet Connection Status -->
+        <div id="connection-status" class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+            <div class="flex gap-3">
+                <i data-lucide="info" class="w-5 h-5 mt-0.5 text-amber-600 flex-shrink-0"></i>
                 <div>
-                    <p class="text-xs text-slate-500">ช่วงวันที่นิเทศ</p>
-                    <p class="font-bold text-slate-800 text-sm">1 ก.ค. - 31 ส.ค. 2569</p>
+                    <span class="font-semibold block">ระบบอยู่ใน "โหมดทดลองเซฟในเครื่อง (Demo Mode)"</span>
+                    <span class="text-xs text-amber-700/90 block sm:inline">ระบบจะจำลองรายชื่อครูและข้อมูลคิว คุณสามารถกด "เชื่อมต่อระบบหลังบ้าน" เพื่อผูกกับ Google Sheets และ Google Drive จริงได้ทันที</span>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                <div class="p-3 bg-amber-50 text-amber-600 rounded-xl"><i class="fa-solid fa-clock text-2xl"></i></div>
-                <div>
-                    <p class="text-xs text-slate-500">คาบแรก / คาบพัก</p>
-                    <p class="font-bold text-slate-800 text-sm">เริ่ม 08:40 น. | คาบ 6 เริ่ม 13:15 น.</p>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl"><i class="fa-solid fa-clipboard-user text-2xl"></i></div>
-                <div>
-                    <p class="text-xs text-slate-500">จำนวนการจองในระบบ</p>
-                    <p id="total-bookings-count" class="font-black text-slate-800 text-xl">0 รายการ</p>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                <div class="p-3 bg-sky-50 text-sky-600 rounded-xl"><i class="fa-solid fa-user-check text-2xl"></i></div>
-                <div>
-                    <p class="text-xs text-slate-500">ฐานข้อมูลครูที่โหลด</p>
-                    <p id="total-teachers-count" class="font-bold text-slate-800 text-sm">กำลังโหลด...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Google Sheet Link Status Bar -->
-        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center space-x-3 text-sm">
-                <span class="relative flex h-3 w-3">
-                    <span id="api-status-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span id="api-status-dot" class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
-                </span>
-                <span id="api-status-text" class="text-slate-600 font-medium">เชื่อมต่อแบบฐานข้อมูลภายในเครื่อง (Local Storage Mode)</span>
-            </div>
-            <button onclick="syncDataFromGoogleSheet()" class="inline-flex items-center space-x-2 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-4 py-2 rounded-xl border border-indigo-200/50 transition-all">
-                <i class="fa-solid fa-arrows-rotate" id="sync-icon"></i>
-                <span>ซิงค์ข้อมูลครูและประวัติจองจาก Google Sheet</span>
+            <button onclick="openConfigModal()" class="text-xs bg-amber-600 text-white font-medium px-3 py-1.5 rounded-lg hover:bg-amber-700 transition flex items-center gap-1">
+                <i data-lucide="link" class="w-3.5 h-3.5"></i> ตั้งค่าเชื่อมโยง Google Sheets
             </button>
         </div>
 
-        <!-- Hidden Input File for Table Post-Attachment -->
-        <input id="table-pdf-file-input" type="file" accept=".pdf" class="sr-only" onchange="handleTableFileSelected(event)">
+        <div id="success-status" class="hidden mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between gap-3 shadow-sm">
+            <div class="flex items-center gap-3">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-600 animate-bounce"></i>
+                <div>
+                    <span class="font-semibold block text-sm sm:text-base">เชื่อมโยง Google Sheets และ Google Drive สำเร็จ!</span>
+                    <span class="text-xs text-emerald-700">ดึงข้อมูลรายชื่อคุณครูจากชีต <b>Teachers</b> และบันทึกประวัติการจองลงชีต <b>Bookings</b> แบบ Real-time</span>
+                </div>
+            </div>
+            <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Connected</span>
+        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Left Side: Calendar and Quick Reservation View -->
+        <!-- ==================== TAB 1: BOOKING & CALENDAR ==================== -->
+        <div id="tab-booking" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Panel: Interactive Calendar and Day Details -->
             <div class="lg:col-span-7 space-y-6">
-                <!-- Interactive Calendar Card -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 border-b pb-4 border-slate-100 gap-2">
-                        <h2 class="text-lg font-bold text-slate-800 flex items-center">
-                            <i class="fa-solid fa-calendar-check text-indigo-600 mr-2.5"></i> เลือกวันที่จะตรวจนิเทศการเรียน
-                        </h2>
-                        <div class="flex space-x-2">
-                            <span class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-100">
-                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-1.5"></span> คิวเต็ม
-                            </span>
-                            <span class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span> ว่าง / เลือกได้
-                            </span>
+                <!-- Month Filter and Calendar Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="calendar" class="w-5 h-5 text-teal-600"></i>
+                            <h2 class="text-lg font-bold text-slate-800">เลือกวันจัดกิจกรรมนิเทศ (1 ก.ค. - 31 ส.ค.)</h2>
+                        </div>
+                        <!-- Month Selector -->
+                        <div class="flex bg-slate-100 p-1 rounded-lg">
+                            <button id="btn-july" onclick="changeMonth(7)" class="px-4 py-1.5 rounded-md text-xs font-semibold transition bg-white text-teal-700 shadow-sm">
+                                กรกฎาคม 2569
+                            </button>
+                            <button id="btn-august" onclick="changeMonth(8)" class="px-4 py-1.5 rounded-md text-xs font-semibold transition text-slate-600 hover:text-slate-800">
+                                สิงหาคม 2569
+                            </button>
                         </div>
                     </div>
+
+                    <!-- Calendar Grid -->
+                    <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-500 mb-2">
+                        <div class="py-2 text-rose-500">อา.</div>
+                        <div class="py-2">จ.</div>
+                        <div class="py-2">อ.</div>
+                        <div class="py-2">พ.</div>
+                        <div class="py-2">พฤ.</div>
+                        <div class="py-2 text-teal-600">ศ.</div>
+                        <div class="py-2 text-rose-500">ส.</div>
+                    </div>
+                    <div id="calendar-days" class="grid grid-cols-7 gap-1.5">
+                        <!-- Days will be dynamically loaded here -->
+                    </div>
                     
-                    <!-- Flatpickr Inline Calendar -->
-                    <div class="flex justify-center">
-                        <div id="inline-calendar" class="w-full"></div>
+                    <div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-500 border-t border-slate-100 pt-4">
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-3.5 h-3.5 rounded-md bg-teal-100 border border-teal-300"></div>
+                            <span>เลือกอยู่</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-3.5 h-3.5 rounded-md bg-teal-600"></div>
+                            <span>วันนี้</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-3.5 h-3.5 rounded-md bg-amber-100 border border-amber-300"></div>
+                            <span>มีการจองบางคาบ</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-3.5 h-3.5 rounded-md bg-rose-100 border border-rose-300"></div>
+                            <span>เต็มทุกคาบ</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-3.5 h-3.5 rounded-md bg-slate-100 border border-slate-200"></div>
+                            <span>ปิดจอง/เสาร์-อาทิตย์</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Timetable Slot status for selected day -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 pb-4 border-b border-slate-100">
-                        <h3 class="text-sm font-bold text-slate-800 flex items-center">
-                            <i class="fa-solid fa-hourglass-half text-amber-500 mr-2"></i> สถานะคาบเรียนวันที่: 
-                            <span id="selected-date-display" class="text-indigo-700 ml-1.5 font-bold">กรุณาเลือกวันที่</span>
-                        </h3>
-                        <span id="slot-day-info" class="text-[11px] text-slate-500 bg-slate-100 px-2 py-1 rounded-md mt-1 sm:mt-0 font-medium">ตารางเวลา: คาบที่ 6 เริ่ม 13:15 น. (พัก 5 นาทีในคาบถัดไป)</span>
+                <!-- Daily Periods Details Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="clock" class="w-5 h-5 text-teal-600"></i>
+                            <h3 class="font-bold text-slate-800">
+                                ตารางคาบเรียนประจำวันที่ <span id="selected-date-label" class="text-teal-600 font-extrabold">1 ก.ค. 2569</span>
+                            </h3>
+                        </div>
+                        <span class="text-xs bg-teal-50 text-teal-700 px-2.5 py-1 rounded-full font-semibold border border-teal-100">
+                            คาบเรียนที่ 1 - 9
+                        </span>
                     </div>
 
-                    <!-- Period grid (1 to 9) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="periods-grid-container">
-                        <!-- Generates 1-9 periods by JS -->
+                    <!-- Period Blocks List -->
+                    <div id="period-status-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <!-- Dynamic Period Slots will load here -->
                     </div>
                 </div>
             </div>
 
-            <!-- Right Side: Booking Form -->
-            <div class="lg:col-span-5" id="booking-section">
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 sticky top-6">
-                    <div class="border-b pb-4 mb-4">
-                        <h2 class="text-lg font-bold text-slate-800 flex items-center">
-                            <i class="fa-solid fa-file-signature text-emerald-600 mr-2.5"></i> บันทึกข้อมูลการจองนิเทศ
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-1">กรอกข้อมูลให้ครบถ้วน (ไม่บังคับแนบแผนการสอน สามารถแนบภายหลังได้)</p>
+            <!-- Right Panel: Booking Form (Removed File Upload) -->
+            <div class="lg:col-span-5">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sticky top-24">
+                    <div class="flex items-center gap-2.5 mb-5 border-b border-slate-100 pb-4">
+                        <i data-lucide="file-text" class="w-6 h-6 text-teal-600"></i>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800">กรอกข้อมูลการจองนิเทศ</h2>
+                            <p class="text-xs text-slate-500">กรุณาเลือกวันและคาบเรียนทางซ้ายเพื่อทำรายการจอง (แนบแผนการสอนได้หลังทำการจองแล้ว)</p>
+                        </div>
                     </div>
-                    
+
                     <form id="booking-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                        
-                        <!-- 1. Date Selection -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1.5">วันที่นิเทศ <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-solid fa-calendar-day text-sm"></i>
-                                </div>
-                                <input type="text" id="booking-date" required readonly
-                                    class="pl-10 w-full rounded-xl border border-slate-300 bg-slate-50 py-3 px-3 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-not-allowed" 
-                                    placeholder="กรุณาคลิกเลือกวันที่บนปฏิทิน">
-                            </div>
-                        </div>
-
-                        <!-- 2. Period Selection -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1.5">คาบเรียนที่จอง <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-solid fa-clock text-sm"></i>
-                                </div>
-                                <select id="booking-period" required onchange="checkDoubleBooking()"
-                                    class="pl-10 w-full rounded-xl border border-slate-300 py-3 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 bg-white">
-                                    <option value="" disabled selected>-- เลือกคาบเรียน (หรือกดจากตารางซ้าย) --</option>
-                                    <!-- Options will be rendered with exact calculated times by JavaScript -->
-                                </select>
-                            </div>
-                            <p id="period-status-alert" class="mt-1.5 text-xs hidden font-medium"></p>
-                        </div>
-
-                        <!-- 3. Teacher Selection -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1.5">ชื่อผู้รับการนิเทศ (ครูผู้สอน) <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-solid fa-user-tie text-sm"></i>
-                                </div>
-                                <input type="text" id="teacher-search" oninput="filterTeachers()" placeholder="พิมพ์คำเพื่อค้นหาชื่อครูจากระบบ..."
-                                    class="pl-10 w-full rounded-t-xl border border-slate-300 py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <select id="teacher-select" size="4" required onchange="selectTeacherFromList()"
-                                    class="w-full border-x border-b border-slate-300 rounded-b-xl text-sm text-slate-700 bg-white overflow-y-auto max-h-32">
-                                    <!-- Populated dynamically -->
-                                </select>
-                            </div>
-                            <p class="text-[11px] text-slate-400 mt-1"><i class="fa-solid fa-info-circle mr-1"></i>ดึงข้อมูลอัตโนมัติจากแท็บชีตครู</p>
-                        </div>
-
-                        <!-- 4. Subject Info -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1.5">รหัสและรายวิชาที่นิเทศ <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-solid fa-book-open text-sm"></i>
-                                </div>
-                                <input type="text" id="subject-name" required placeholder="เช่น อ31101 ภาษาอังกฤษพื้นฐาน"
-                                    class="pl-10 w-full rounded-xl border border-slate-300 py-3 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800">
-                            </div>
-                        </div>
-
-                        <!-- 5. Room & Class Level (ม.1/1 - ม.6/4) -->
-                        <div class="grid grid-cols-2 gap-4">
+                        <!-- Selected Date and Time (Readonly show) -->
+                        <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1.5">ชั้นเรียน <span class="text-red-500">*</span></label>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">วันที่เลือก</label>
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-users text-sm"></i>
-                                    </div>
-                                    <select id="class-level" required
-                                        class="pl-10 w-full rounded-xl border border-slate-300 py-3 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 bg-white">
-                                        <option value="" disabled selected>เลือกชั้น</option>
-                                        <!-- Will populate ม.1/1 to ม.6/4 dynamically -->
-                                    </select>
+                                    <input type="text" id="form-display-date" readonly class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 font-medium focus:outline-none cursor-not-allowed">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-slate-400 absolute right-3 top-2.5"></i>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1.5">ห้องเรียน / อาคาร <span class="text-red-500">*</span></label>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">คาบเรียนที่เลือก</label>
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-school text-sm"></i>
-                                    </div>
-                                    <input type="text" id="classroom-no" required placeholder="เช่น ห้อง 232, Lab"
-                                        class="pl-10 w-full rounded-xl border border-slate-300 py-3 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800">
+                                    <input type="text" id="form-display-period" readonly placeholder="กรุณาเลือกคาบเรียน" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 font-bold focus:outline-none cursor-not-allowed text-teal-600 placeholder-rose-400">
+                                    <i data-lucide="clock" class="w-4 h-4 text-slate-400 absolute right-3 top-2.5"></i>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 6. File Attachment PDF -->
+                        <!-- Teacher Select (Combobox from GS or Local) -->
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1.5">อัปโหลดแผนการจัดการเรียนรู้ (เฉพาะ PDF เท่านั้น - ไม่บังคับแนบ)</label>
-                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-2xl hover:bg-slate-50 transition-colors relative cursor-pointer" onclick="document.getElementById('pdf-file').click()">
-                                <div class="space-y-1 text-center">
-                                    <i id="pdf-icon" class="fa-solid fa-file-pdf text-3xl text-slate-400 mb-2"></i>
-                                    <div class="flex text-sm text-gray-600 justify-center">
-                                        <span class="relative rounded-md font-medium text-indigo-600 hover:text-indigo-500">
-                                            คลิกเพื่อเลือกไฟล์ PDF (ไม่บังคับ)
-                                        </span>
-                                    </div>
-                                    <p class="text-xs text-slate-400">ไฟล์เอกสารจำกัดขนาดไม่เกิน 5MB</p>
-                                    <p id="file-name-display" class="text-xs text-emerald-600 font-bold mt-2 hidden"></p>
-                                </div>
-                                <input id="pdf-file" type="file" accept=".pdf" class="sr-only" onchange="handleFileSelected(event)">
+                            <label for="booking-teacher" class="block text-xs font-semibold text-slate-600 mb-1">ชื่อคุณครูผู้รับการนิเทศ <span class="text-rose-500">*</span></label>
+                            <div class="relative">
+                                <select id="booking-teacher" required class="w-full border border-slate-200 rounded-lg pl-10 pr-3 py-2 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-slate-700 bg-white">
+                                    <option value="" disabled selected>-- เลือกรายชื่อครู --</option>
+                                    <!-- Dynamic Option Lists -->
+                                </select>
+                                <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
                             </div>
                         </div>
 
-                        <!-- Submit Button -->
-                        <div class="pt-2">
-                            <button type="submit" id="btn-submit-booking"
-                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg transition-all duration-150 flex items-center justify-center space-x-2">
-                                <i class="fa-solid fa-cloud-arrow-up"></i>
-                                <span>ยืนยันบันทึกการจองเวลานิเทศ</span>
+                        <!-- Subject -->
+                        <div>
+                            <label for="booking-subject" class="block text-xs font-semibold text-slate-600 mb-1">รายวิชา (ระบุรหัสและชื่อวิชา) <span class="text-rose-500">*</span></label>
+                            <div class="relative">
+                                <input type="text" id="booking-subject" required placeholder="เช่น ค31101 คณิตศาสตร์พื้นฐาน 1" class="w-full border border-slate-200 rounded-lg pl-10 pr-3 py-2 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-slate-700">
+                                <i data-lucide="book-open" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+                            </div>
+                        </div>
+
+                        <!-- Class Level & Classroom Grid -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <!-- Class Level (ม.1/1 - ม.6/4) -->
+                            <div>
+                                <label for="booking-level" class="block text-xs font-semibold text-slate-600 mb-1">ระดับชั้นเรียน <span class="text-rose-500">*</span></label>
+                                <select id="booking-level" required class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-slate-700 bg-white">
+                                    <option value="" disabled selected>เลือกชั้นเรียน</option>
+                                    <!-- Generated by Javascript -->
+                                </select>
+                            </div>
+                            <!-- Classroom Location -->
+                            <div>
+                                <label for="booking-room" class="block text-xs font-semibold text-slate-600 mb-1">ห้องเรียนที่นิเทศ <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <input type="text" id="booking-room" required placeholder="เช่น ห้อง 421 / คอม 1" class="w-full border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-slate-700">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-slate-400 absolute left-2.5 top-3"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Action Buttons -->
+                        <div class="pt-4 flex gap-2">
+                            <button type="button" onclick="resetForm()" class="w-1/3 py-2.5 text-xs font-bold text-slate-500 bg-slate-100 rounded-xl hover:bg-slate-200 transition">
+                                ล้างฟอร์ม
+                            </button>
+                            <button type="submit" class="w-2/3 py-2.5 text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl shadow-lg shadow-teal-600/15 hover:shadow-teal-600/25 transition flex items-center justify-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> บันทึกคิวการนิเทศ
                             </button>
                         </div>
                     </form>
@@ -288,1116 +255,1159 @@
             </div>
         </div>
 
-        <!-- Bookings Directory Section -->
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <!-- ==================== TAB 2: LIST OF BOOKINGS ==================== -->
+        <div id="tab-list" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b border-slate-100 pb-5">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-800 flex items-center">
-                        <i class="fa-solid fa-table-list text-indigo-600 mr-2.5"></i> ตารางสรุปรายการจองเวลานิเทศทั้งหมด
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="table-properties" class="text-teal-600"></i> รายการจองวันนิเทศทั้งหมด
                     </h2>
-                    <p class="text-xs text-slate-400 mt-0.5">ระบบจะจัดเรียงเวลา และตรวจสอบป้องกันการจองซ้ำ (สามารถกดแนบไฟล์ภายหลังได้ที่ตารางสรุปนี้)</p>
+                    <p class="text-xs text-slate-500">คลิกที่<b>ชื่อครู</b> หรือปุ่ม <b>"แนบแผนการสอน"</b> เพื่อแนบไฟล์ PDF แผนการจัดการเรียนรู้ขึ้น Google Drive ย้อนหลัง</p>
                 </div>
-                <div class="flex items-center space-x-2 w-full sm:w-auto">
-                    <div class="relative flex-grow sm:flex-grow-0">
-                        <input type="text" id="search-bookings" oninput="renderBookingsTable()" placeholder="ค้นหารายการจอง..."
-                            class="w-full sm:w-64 pl-9 pr-4 py-2.5 border border-slate-300 rounded-xl text-xs focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-slate-400 text-xs"></i>
-                    </div>
+                
+                <!-- Search bar -->
+                <div class="relative w-full sm:w-64">
+                    <input type="text" id="booking-search" oninput="filterBookings()" placeholder="ค้นหาครู, วิชา, ชั้นเรียน..." class="w-full border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs focus:border-teal-500 focus:ring-1 focus:ring-teal-200 outline-none">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
                 </div>
             </div>
 
             <!-- Table -->
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto rounded-xl border border-slate-100">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-100/75 border-b border-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider">
-                            <th class="py-4 px-4 text-center">วันที่นิเทศ</th>
-                            <th class="py-4 px-4 text-center">คาบเรียน / ช่วงเวลา</th>
-                            <th class="py-4 px-4">ผู้รับการนิเทศ</th>
-                            <th class="py-4 px-4">รายวิชา</th>
-                            <th class="py-4 px-4 text-center">ชั้นเรียน / ห้อง</th>
-                            <th class="py-4 px-4 text-center">แผนการจัดเรียนรู้</th>
-                            <th class="py-4 px-4 text-center">จัดการ</th>
+                        <tr class="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-600">
+                            <th class="p-4">วันที่รับนิเทศ</th>
+                            <th class="p-4">คาบเรียน / เวลา</th>
+                            <th class="p-4">ครูผู้รับการนิเทศ (คลิกเพื่ออัปโหลดไฟล์)</th>
+                            <th class="p-4">รายวิชา</th>
+                            <th class="p-4">ระดับชั้น</th>
+                            <th class="p-4">ห้องเรียน</th>
+                            <th class="p-4 text-center">แผนการสอนบน Drive</th>
+                            <th class="p-4 text-center">การจัดการ</th>
                         </tr>
                     </thead>
-                    <tbody id="bookings-table-body" class="divide-y divide-slate-100 text-slate-700 text-sm">
-                        <!-- Table rows populated dynamically -->
+                    <tbody id="bookings-table-body" class="text-xs divide-y divide-slate-100 text-slate-700">
+                        <!-- Dynamic list of Bookings -->
                     </tbody>
                 </table>
             </div>
             
-            <!-- Empty state -->
-            <div id="table-empty-state" class="py-12 text-center text-slate-400 hidden">
-                <i class="fa-regular fa-folder-open text-5xl mb-3 text-slate-300"></i>
-                <p class="text-sm font-medium">ไม่พบข้อมูลการจองในขณะนี้</p>
+            <div id="empty-state" class="hidden text-center py-16">
+                <div class="bg-slate-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i data-lucide="inbox" class="w-6 h-6 text-slate-400"></i>
+                </div>
+                <h3 class="font-bold text-slate-700">ยังไม่มีประวัติการจอง</h3>
+                <p class="text-xs text-slate-400 mt-1">กรุณากลับไปที่หน้าทำรายการจองเพื่อเริ่มจองคิวแรก</p>
             </div>
         </div>
 
     </main>
 
-    <!-- Success / Info Message Modal -->
-    <div id="custom-modal" class="fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 transform transition-all scale-95 duration-300">
-            <div class="text-center">
-                <div id="modal-icon-container" class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-emerald-100 text-emerald-600 mb-4">
-                    <!-- Icon inject dynamically -->
+    <!-- ==================== CONFIGURATION MODAL ==================== -->
+    <div id="config-modal" class="hidden fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-teal-600 to-cyan-700 text-white p-5 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="database" class="w-5 h-5"></i>
+                    <h3 class="font-bold text-lg">ตั้งค่าระบบ Google Apps Script</h3>
                 </div>
-                <h3 id="modal-title" class="text-lg font-bold text-slate-900 mb-2"></h3>
-                <p id="modal-message" class="text-sm text-slate-500 mb-6 leading-relaxed"></p>
-                <div class="flex justify-center space-x-3">
-                    <button id="modal-btn-close" onclick="closeModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-5 py-2.5 rounded-xl text-sm transition-colors">
-                        ปิดหน้าต่าง
-                    </button>
-                    <button id="modal-btn-action" onclick="printReceipt()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors hidden">
-                        <i class="fa-solid fa-print mr-1"></i> พิมพ์ใบยืนยัน
-                    </button>
+                <button onclick="closeConfigModal()" class="text-teal-100 hover:text-white p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Scrollable Content -->
+            <div class="p-6 overflow-y-auto space-y-5 text-sm">
+                <div>
+                    <label for="google-sheet-url" class="block text-xs font-semibold text-slate-600 mb-1">Google Apps Script Web App URL</label>
+                    <div class="relative">
+                        <input type="url" id="google-sheet-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border border-slate-200 rounded-lg pl-10 pr-3 py-2.5 text-xs focus:border-teal-500 focus:ring-1 focus:ring-teal-200 outline-none">
+                        <i data-lucide="link-2" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1">กรอก URL เว็บแอปที่ได้รับจากการ Deploy สิทธิ์เป็นแบบ "Anyone" เพื่อเชื่อมต่อระบบส่งไฟล์และจองข้อมูล</p>
                 </div>
+
+                <!-- Google Apps Script Installation Steps -->
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                    <h4 class="font-semibold text-xs text-slate-700 flex items-center gap-1.5 mb-2">
+                        <i data-lucide="terminal" class="w-4 h-4 text-teal-600"></i> ขั้นตอนการสร้างระบบบันทึกและอัปโหลดเข้า Google Drive ไร้การเข้าสู่ระบบ
+                    </h4>
+                    <ol class="list-decimal list-inside text-xs text-slate-600 space-y-2 leading-relaxed">
+                        <li>สร้าง Google Sheet ใหม่ และตั้งชื่อแผ่นงานแรกสุดว่า <code class="bg-slate-200 px-1 rounded font-bold">Teachers</code> และแผ่นงานที่สองว่า <code class="bg-slate-200 px-1 rounded font-bold">Bookings</code></li>
+                        <li>ในชีต <code class="bg-slate-200 px-1 rounded">Teachers</code> ช่อง <code class="bg-slate-200 px-1 rounded">A1</code> ใส่หัวข้อว่า <code class="bg-slate-200 px-1 rounded">Teacher Name</code> จากนั้นกรอกรายชื่อครูในแถวถัดๆ ไป (A2, A3, ...)</li>
+                        <li>ใน Google Sheet เปิดเมนู <span class="font-bold text-slate-800">Extensions (ส่วนขยาย) &gt; Apps Script</span></li>
+                        <li>คัดลอกโค้ดสคริปต์ <span class="text-teal-600 font-bold">"โค้ดระบบหลังบ้าน" (ด้านล่างนี้)</span> ไปวางในแท็บแก้ไขไฟล์ <code class="bg-slate-200 px-1 rounded">Code.gs</code></li>
+                        <li>สร้างโฟลเดอร์สำหรับรับไฟล์แผนการสอน PDF ใน Google Drive ของคุณ และนำ <span class="font-bold text-teal-600">Folder ID ของคุณ</span> มาใส่ในตัวแปร <code class="bg-slate-200 px-1 rounded">DRIVE_FOLDER_ID</code> ภายในโค้ดสคริปต์ (ห้ามใช้ตัวอย่าง ID เดิมเด็ดขาด)</li>
+                        <li>กด Save และกดปุ่ม <span class="font-bold text-slate-800">Deploy &gt; New deployment (การติดตั้งใช้งานใหม่)</span></li>
+                        <li>เลือกประเภทเป็น <span class="font-bold text-slate-800">Web App</span>, รันภายใต้บัญชี: <span class="font-bold text-slate-800">"Me" (ตัวท่านเอง)</span> และตั้งค่าผู้เข้าถึงเป็น <span class="font-bold text-slate-800">"Everyone" (ทุกคน)</span> เพื่อให้ครูอัปโหลดได้แบบไม่ต้อง login</li>
+                        <li>คัดลอก Web App URL นำมาวางในช่องด้านบนแล้วกด "บันทึกการเชื่อมต่อ"</li>
+                    </ol>
+                </div>
+
+                <!-- Apps Script Code block for user to copy -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-semibold text-slate-600">โค้ดระบบหลังบ้าน Google Apps Script (Code.gs)</label>
+                        <button onclick="copyAppsScriptCode()" class="text-xs text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> คัดลอกโค้ดสคริปต์
+                        </button>
+                    </div>
+                    <textarea id="apps-script-code-block" readonly class="w-full h-44 font-mono text-[10px] bg-slate-900 text-teal-400 p-3 rounded-lg border border-slate-800 focus:outline-none"></textarea>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 p-4 border-t border-slate-100 flex justify-end gap-2">
+                <button onclick="closeConfigModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-xs rounded-lg transition">
+                    ยกเลิก
+                </button>
+                <button onclick="saveConfig()" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs rounded-lg transition shadow-md shadow-teal-600/10">
+                    บันทึกการเชื่อมต่อ
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Confirm Dialog Modal -->
-    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
-            <div class="text-center">
-                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-rose-100 text-rose-600 mb-4">
-                    <i class="fa-solid fa-trash-can text-2xl"></i>
+    <!-- ==================== UPLOAD PDF MODAL (Popup สำหรับแนบแผนการสอนย้อนหลัง) ==================== -->
+    <div id="upload-pdf-modal" class="hidden fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 w-full max-w-md overflow-hidden">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-teal-600 to-cyan-700 text-white p-5 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="file-up" class="w-5 h-5"></i>
+                    <h3 class="font-bold text-lg">แนบไฟล์แผนการสอน (PDF)</h3>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">ยกเลิกรายการจองนิเทศ?</h3>
-                <p class="text-xs text-slate-500 mb-6 leading-relaxed">คุณต้องการลบข้อมูลสิทธิ์จองตรวจเวลานิเทศนี้ออกจากฐานระบบใช่หรือไม่? ข้อมูลประวัติการอัปโหลดไฟล์จะถูกถอนออกถาวร</p>
-                <div class="flex justify-center space-x-3">
-                    <button onclick="closeConfirmModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-4 py-2.5 rounded-xl text-xs transition-colors">
-                        ย้อนกลับ
-                    </button>
-                    <button id="confirm-delete-btn" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-colors">
-                        ยืนยันการลบข้อมูล
-                    </button>
+                <button onclick="closeUploadPDFModal()" class="text-teal-100 hover:text-white p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-6 space-y-4 text-sm">
+                <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+                    <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">คุณครูผู้รับนิเทศ</p>
+                    <p id="upload-modal-teacher" class="font-bold text-slate-800 text-sm mt-0.5">-</p>
+                    <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mt-3">รายวิชาที่นิเทศ</p>
+                    <p id="upload-modal-subject" class="font-medium text-slate-600 text-xs mt-0.5">-</p>
                 </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกไฟล์แผนการจัดการเรียนรู้ (PDF) <span class="text-rose-500">*</span></label>
+                    <div id="modal-dropzone" class="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center cursor-pointer hover:border-teal-400 transition bg-slate-50">
+                        <input type="file" id="modal-booking-pdf" accept=".pdf" class="hidden" onchange="handleModalFileSelect(event)">
+                        <div id="modal-dropzone-empty" class="space-y-1">
+                            <i data-lucide="upload-cloud" class="w-10 h-10 text-slate-400 mx-auto animate-pulse"></i>
+                            <p class="text-xs text-slate-600 font-medium">คลิกเพื่อเลือกไฟล์ PDF แผนการสอน</p>
+                            <p class="text-[10px] text-slate-400">ขนาดไฟล์แนะนำไม่เกิน 4MB</p>
+                        </div>
+                        <div id="modal-dropzone-filled" class="hidden flex items-center justify-between bg-teal-50 p-2.5 rounded-lg border border-teal-200">
+                            <div class="flex items-center gap-2 overflow-hidden w-4/5">
+                                <i data-lucide="file-check" class="w-5 h-5 text-teal-600 flex-shrink-0"></i>
+                                <span id="modal-pdf-name-label" class="text-xs font-medium text-teal-800 truncate text-left block">file_name.pdf</span>
+                            </div>
+                            <button type="button" onclick="clearModalFileSelection(event)" class="text-slate-400 hover:text-rose-500 p-1">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 p-4 border-t border-slate-100 flex justify-end gap-2">
+                <button onclick="closeUploadPDFModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-xs rounded-lg transition">
+                    ยกเลิก
+                </button>
+                <button id="btn-submit-pdf" onclick="submitModalPDF()" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs rounded-lg transition shadow-md shadow-teal-600/10 flex items-center gap-1.5">
+                    <i data-lucide="upload" class="w-3.5 h-3.5"></i> อัปโหลดไฟล์
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 mt-12 text-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div>
-                <p class="font-bold text-slate-300">ระบบบริหารจัดการนิเทศการศึกษา ฝ่ายวิชาการและระบบออนไลน์</p>
-                <p class="mt-1">พัฒนาระบบคำนวณคาบเรียนพิจารณาเวลาพักและชั่วโมงพักเที่ยงโดยอัตโนมัติ</p>
+    <!-- ==================== CUSTOM ALERT MODAL ==================== -->
+    <div id="alert-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 w-full max-w-sm overflow-hidden p-6 text-center space-y-4">
+            <div id="alert-icon-container" class="mx-auto w-12 h-12 rounded-full flex items-center justify-center">
+                <!-- Dynamic Icon -->
             </div>
             <div>
-                <span class="bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
-                    <i class="fa-solid fa-shield-check mr-1.5 text-indigo-400"></i> โหมดความมั่นคงทางเทคโนโลยีและข้อมูล
-                </span>
+                <h3 id="alert-title" class="font-bold text-slate-800 text-base">หัวข้อแจ้งเตือน</h3>
+                <p id="alert-message" class="text-xs text-slate-500 mt-1 leading-relaxed">รายละเอียดข้อความแจ้งเตือน</p>
             </div>
+            <button onclick="closeAlert()" class="w-full py-2 bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs rounded-lg transition">
+                ตกลง
+            </button>
         </div>
-    </footer>
+    </div>
 
-    <!-- Scripting for application behavior -->
+    <!-- JS LOGIC CODE -->
     <script>
-        // ==========================================
-        // CONFIGURATION & GLOBAL STATE
-        // ==========================================
+        // App State
+        let currentMonth = 7; // July 2026
+        const currentYear = 2026;
+        let selectedDate = null; // 'YYYY-MM-DD'
+        let selectedPeriod = null; // Number 1-9
         
-        // ** ป้อน URL ของ Web App API ที่ได้จาก Google Sheets ในช่องด้านล่างนี้ **
-        const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxBQywRb1Qg2RnVT612t-Xbb4E0mk76nEEUuYl90UQNB9Oy-t86YuVhWTRp1A-1fwfnKQ/exec"; 
+        // Modal Upload State
+        let activeUploadId = null;
+        let modalBase64PDF = "";
+        let modalPDFName = "";
 
-        // ฐานข้อมูลครูสำรองกรณีที่ชีตยังไม่ได้เชื่อมต่อ (Local Storage Backup)
-        const DEFAULT_TEACHERS = [
-            "นายกษิดิ์เดช พันธุ์งาม", "นางพิมลมาศ เสนอวงศ์", "นางอภิญญา วัฒนากร", "นายณัฐพงศ์ ศรีสมุทร",
-            "นางกานดา มณีโชติ", "ดร. สมชาย มงคลพืช", "นางสาววิลาวัณย์ เจริญเกียรติ", "นายวัชรินทร์ วงศ์สุวรรณ",
-            "นางรุ่งนภา ดิลกเดช", "นายพงศธร แก้วมณี", "นางสาวสุมิตรา สิทธิเดช", "นายสุรพล ธนไพศาล"
+        // API URL (from localStorage if stored)
+        let configAppsScriptUrl = localStorage.getItem('supervision_gas_url_v2') || "";
+        
+        // Setup initial storage state
+        let teachersList = [];
+        let bookings = [];
+
+        // Sample Mock Teachers in case Google Sheet is not connected yet
+        const mockTeachers = [
+            "นางสาวชูติเมต อุทธา", "นางสาวภคอร จันทะเวช", "นางสาวกรรณิการ์ พันสำโรง", 
+            "นางสาวกันยาพร คำจอน", "นายกิตติคุณ จันทะโมคา", "นายจิระเดช ศรีกาญจนวงษ์", 
+            "นางชลลดา เลิศรส", "นายอานนท์ รุ่งเรือง", "นางรพีภัทร ศิลปะ"
         ];
 
-        // โครงสร้างตารางคาบเรียนใหม่พร้อมคำนวณเวลาเริ่มต้น-สิ้นสุด
-        // คาบละ 50 นาที / เวลาพัก 5 นาที / คาบ 5 พักกลางวัน 1 ชั่วโมง (60 นาที)
-        // คาบที่ 6 ปรับเวลาเริ่มต้นเป็น 13:15 น. (ไม่มีเวลาพักคั่นหลังพักกลางวัน) และคาบ 7-9 ปรับพัก 5 นาทีตามลำดับ
-        const PERIODS_METADATA = {
-            1: { start: "08:40", end: "09:30", note: "คาบที่ 1 (50 นาที)" },
-            2: { start: "09:35", end: "10:25", note: "คาบที่ 2 (50 นาที)" },
-            3: { start: "10:30", end: "11:20", note: "คาบที่ 3 (50 นาที)" },
-            4: { start: "11:25", end: "12:15", note: "คาบที่ 4 (50 นาที)" },
-            5: { start: "12:15", end: "13:15", note: "คาบที่ 5 (คาบพักเที่ยง 1 ชั่วโมง)" },
-            6: { start: "13:15", end: "14:05", note: "คาบที่ 6 (50 นาที)" },
-            7: { start: "14:10", end: "15:00", note: "คาบที่ 7 (50 นาที)" },
-            8: { start: "15:05", end: "15:55", note: "คาบที่ 8 (50 นาที)" },
-            9: { start: "16:00", end: "16:50", note: "คาบที่ 9 (50 นาที)" }
-        };
+        // Sample Initial Mock Bookings to show visual representation instantly
+        const mockBookings = [
+            { id: "1", date: "2026-07-01", period: 1, teacher: "นางสาวชูติเมต อุทธา", subject: "ค31101 คณิตศาสตร์ 1", level: "ม.4/1", room: "ห้อง 421", pdfName: "Math_LessonPlan.pdf", driveUrl: "https://drive.google.com/file/d/demo1" },
+            { id: "2", date: "2026-07-01", period: 3, teacher: "นางสาวภคอร จันทะเวช", subject: "ท22101 ภาษาไทย 3", level: "ม.2/2", room: "ห้องภาษาไทย", pdfName: "", driveUrl: "" },
+            { id: "3", date: "2026-07-15", period: 6, teacher: "นายกิตติคุณ จันทะโมคา", subject: "ว23101 วิทยาศาสตร์ 5", level: "ม.3/1", room: "ห้องแล็บฟิสิกส์", pdfName: "Science_M3.pdf", driveUrl: "https://drive.google.com/file/d/demo3" }
+        ];
 
-        // State Manager
-        let appState = {
-            bookings: [],       // ข้อมูลรายการจอง
-            teachers: [],       // รายชื่อครู
-            selectedDate: null, // ฟอร์แมตหลัก: YYYY-MM-DD
-            calendarInstance: null,
-            uploadedPdfBase64: null,
-            uploadedPdfName: null,
-            toDeleteId: null,
-            tableUploadTargetId: null // สำหรับเก็บไอดีเป้าหมายที่จะแนบไฟล์ในตารางย้อนหลัง
-        };
-
-        // Generates ม.1/1 to ม.6/4
-        const generateClassLevels = () => {
-            const classSelect = document.getElementById('class-level');
-            for (let grade = 1; grade <= 6; grade++) {
-                for (let room = 1; room <= 4; room++) {
-                    const value = `ม.${grade}/${room}`;
-                    const option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    classSelect.appendChild(option);
-                }
+        // Class Level Lists generator (ม.1/1 - ม.6/4)
+        const levels = [];
+        for (let grade = 1; grade <= 6; grade++) {
+            for (let room = 1; room <= 4; room++) {
+                levels.push(`ม.${grade}/${room}`);
             }
-        };
+        }
 
-        // Populate Form Select elements for period times
-        const populatePeriodFormOptions = () => {
-            const select = document.getElementById('booking-period');
-            select.innerHTML = '<option value="" disabled selected>-- เลือกคาบเรียน (หรือคลิกจากตารางซ้าย) --</option>';
-            
-            for (let p = 1; p <= 9; p++) {
-                const meta = PERIODS_METADATA[p];
-                const option = document.createElement('option');
-                option.value = p;
-                option.textContent = `คาบที่ ${p} (${meta.start} - ${meta.end} น.)${p === 5 ? ' *พักเที่ยง' : ''}`;
-                select.appendChild(option);
-            }
-        };
+        // Times config
+        const periodTimes = [
+            { period: 1, label: "คาบที่ 1", time: "08:40 - 09:30" },
+            { period: 2, label: "คาบที่ 2", time: "09:35 - 10:25" },
+            { period: 3, label: "คาบที่ 3", time: "10:30 - 11:20" },
+            { period: 4, label: "คาบที่ 4", time: "11:25 - 12:15" },
+            { period: 5, label: "คาบที่ 5 (พักกลางวัน)", time: "12:15 - 13:15", isLunch: true },
+            { period: 6, label: "คาบที่ 6", time: "13:15 - 14:05" },
+            { period: 7, label: "คาบที่ 7", time: "14:10 - 15:00" },
+            { period: 8, label: "คาบที่ 8", time: "15:05 - 15:55" },
+            { period: 9, label: "คาบที่ 9", time: "16:00 - 16:50" }
+        ];
 
-        // Initialize Teacher lists UI
-        const renderTeachersDropdown = (teachersList) => {
-            const select = document.getElementById('teacher-select');
-            select.innerHTML = '';
-            
-            const sortedList = [...teachersList].sort();
-            sortedList.forEach(teacher => {
+        // Google Apps Script source code template for Drive uploading & Sheet writing
+        const appsScriptSourceCode = `/*
+  =============================================================================
+  GOOGLE APPS SCRIPT: สำหรับระบบนิเทศ (ดึงชื่อจาก Teachers และบันทึกลงชีต Bookings)
+  =============================================================================
+*/
+
+// !!! แก้ไข ID โฟลเดอร์ Google Drive ของคุณที่ต้องการบันทึกแผนการสอน PDF ที่นี่ !!!
+// (นำ ID จาก URL ของโฟลเดอร์ Google Drive ของคุณมาสวมทับ เช่น 1a2b3c4d5e... ของคุณเอง)
+const DRIVE_FOLDER_ID = "กรุณาใส่_ID_โฟลเดอร์_GOOGLE_DRIVE_ของคุณตรงนี้";
+
+const SHEET_TEACHERS = "Teachers";
+const SHEET_BOOKINGS = "Bookings";
+
+/**
+ * ฟังก์ชันสำหรับกดรับสิทธิ์ (Authorization) และทดสอบโครงสร้างเริ่มต้นของสเปรดชีต
+ * !!! ให้เลือกฟังก์ชัน "initSystem" นี้ที่เมนูด้านบน แล้วกดปุ่ม "เรียกใช้งาน" (Run) !!!
+ */
+function initSystem() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss) {
+    throw new Error("ไม่พบสเปรดชีตที่เชื่อมโยง กรุณาตรวจสอบว่าคุณเปิดสคริปต์นี้จาก Extensions > Apps Script ในหน้า Google Sheet");
+  }
+  ensureSheetsExist(ss);
+  
+  try {
+    const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+    Logger.log("เชื่อมต่อโฟลเดอร์ Drive สำเร็จ! ชื่อโฟลเดอร์: " + folder.getName());
+  } catch (e) {
+    Logger.log("ระบบตรวจสอบสิทธิ์เข้าถึง Drive เรียบร้อยแล้ว (โปรดแน่ใจว่าได้ระบุ ID โฟลเดอร์ถูกต้อง): " + e.toString());
+  }
+  
+  Logger.log("ดำเนินการตั้งค่าชีตระบบเรียบร้อยแล้ว!");
+}
+
+function doGet(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  ensureSheetsExist(ss);
+  
+  const teachersSheet = ss.getSheetByName(SHEET_TEACHERS);
+  const bookingsSheet = ss.getSheetByName(SHEET_BOOKINGS);
+  
+  // 1. ดึงรายชื่อคุณครูจากชีต "Teachers"
+  const teachersData = teachersSheet.getDataRange().getValues();
+  const teachers = [];
+  for(let i = 1; i < teachersData.length; i++) {
+    const name = teachersData[i][0];
+    if(name && String(name).trim() !== "") {
+      teachers.push(String(name).trim());
+    }
+  }
+  
+  // 2. ดึงประวัติการจองทั้งหมดจากชีต "Bookings"
+  const bookingsData = bookingsSheet.getDataRange().getValues();
+  const bookings = [];
+  for(let i = 1; i < bookingsData.length; i++) {
+    const row = bookingsData[i];
+    if(row[0]) {
+      bookings.push({
+        id: row[0],
+        date: formatDate(row[1]),
+        period: Number(row[2]),
+        teacher: row[3],
+        subject: row[4],
+        level: row[5],
+        room: row[6],
+        pdfName: row[7] || "",
+        driveUrl: row[8] || ""
+      });
+    }
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify({
+    success: true,
+    teachers: teachers,
+    bookings: bookings
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    ensureSheetsExist(ss);
+    
+    const bookingsSheet = ss.getSheetByName(SHEET_BOOKINGS);
+    
+    // ============================================
+    // กรณีที่ 1: อัปโหลดและแนบไฟล์ PDF ย้อนหลัง
+    // ============================================
+    if (data.action === "uploadPDF" && data.id) {
+      const bookingsData = bookingsSheet.getDataRange().getValues();
+      let targetRowIndex = -1;
+      
+      for (let i = 1; i < bookingsData.length; i++) {
+        if (String(bookingsData[i][0]) === String(data.id)) {
+          targetRowIndex = i + 1; // แปลงเป็น Index 1-Based ในชีต
+          break;
+        }
+      }
+      
+      if (targetRowIndex === -1) {
+        return ContentService.createTextOutput(JSON.stringify({
+          success: false,
+          message: "ไม่พบรหัสคิวการจองในระบบ"
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+      
+      // ดำเนินการสร้างไฟล์ลง Google Drive
+      let finalDriveUrl = "";
+      if (data.pdfData && data.pdfName) {
+        if (DRIVE_FOLDER_ID.includes("ของคุณตรงนี้") || DRIVE_FOLDER_ID === "") {
+          return ContentService.createTextOutput(JSON.stringify({
+            success: false,
+            message: "กรุณาเข้าไปแก้ไข ID โฟลเดอร์ Google Drive ของคุณในสคริปต์หลังบ้าน (Code.gs บรรทัดที่ 10) ก่อนดำเนินการอัปโหลดไฟล์ครับ"
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+        const splitData = data.pdfData.split(",");
+        const contentType = splitData[0].match(/:(.*?);/)[1];
+        const bytes = Utilities.base64Decode(splitData[1]);
+        const blob = Utilities.newBlob(bytes, contentType, data.pdfName);
+        
+        const file = folder.createFile(blob);
+        
+        // ครอบ try-catch เพื่อป้องกันปัญหานโยบายความปลอดภัยของสถาบัน/โรงเรียน บล็อกการแชร์แบบสาธารณะ
+        try {
+          file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        } catch (sharingError) {
+          try {
+            // หากแชร์ให้บุคคลภายนอกทั่วไปไม่ได้ ให้ทดลองแชร์ให้คนในโดเมนเดียวกันเปิดแทน
+            file.setSharing(DriveApp.Access.DOMAIN_WITH_LINK, DriveApp.Permission.VIEW);
+          } catch (domainError) {
+            // หากโดนจำกัดทุกกรณี ให้เก็บไฟล์แบบส่วนตัว (Private) ตามเดิมเพื่อไม่ให้ระบบหลังบ้านขัดข้อง
+          }
+        }
+        
+        finalDriveUrl = file.getUrl();
+        
+        // อัปเดตชีต Bookings ที่คอลัมน์ PDF Name (คอลัมน์ที่ 8) และ Google Drive URL (คอลัมน์ที่ 9)
+        bookingsSheet.getRange(targetRowIndex, 8).setValue(data.pdfName);
+        bookingsSheet.getRange(targetRowIndex, 9).setValue(finalDriveUrl);
+        
+        return ContentService.createTextOutput(JSON.stringify({
+          success: true,
+          driveUrl: finalDriveUrl,
+          pdfName: data.pdfName
+        })).setMimeType(ContentService.MimeType.JSON);
+      } else {
+        return ContentService.createTextOutput(JSON.stringify({
+          success: false,
+          message: "ข้อมูลไฟล์ PDF ไม่ถูกต้อง"
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    
+    // ============================================
+    // กรณีที่ 2: เป็นการสร้างคิวจองการนิเทศใหม่ (ไม่ต้องส่งแผนการสอน)
+    // ============================================
+    // ตรวจสอบการจองซ้ำกัน (Double-booking pre-check)
+    const bookingsData = bookingsSheet.getDataRange().getValues();
+    const newDateStr = data.date;
+    const newPeriod = Number(data.period);
+    
+    for (let i = 1; i < bookingsData.length; i++) {
+      const dbDateStr = formatDate(bookingsData[i][1]);
+      const dbPeriod = Number(bookingsData[i][2]);
+      if (dbDateStr === newDateStr && dbPeriod === newPeriod) {
+        return ContentService.createTextOutput(JSON.stringify({
+          success: false,
+          message: "ขออภัย คาบเรียนนี้ในวันที่เลือก ถูกจองไปเรียบร้อยแล้ว กรุณาเลือกวันหรือเวลาใหม่อีกครั้ง"
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    
+    // บันทึกคิวจองลงชีต Bookings โดยปล่อยช่องแผนการสอนเป็นค่าว่าง
+    const newId = Utilities.getUuid();
+    bookingsSheet.appendRow([
+      newId,
+      newDateStr,
+      newPeriod,
+      data.teacher,
+      data.subject,
+      data.level,
+      data.room,
+      "", // PDF Name (ว่างไว้รอแนบ)
+      "", // Google Drive URL (ว่างไว้รอแนบ)
+      new Date()
+    ]);
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      success: true,
+      id: newId
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false,
+      message: "ระบบหลังบ้านขัดข้อง: " + err.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function ensureSheetsExist(ss) {
+  if (!ss.getSheetByName(SHEET_TEACHERS)) {
+    const tSheet = ss.insertSheet(SHEET_TEACHERS);
+    tSheet.appendRow(["Teacher Name"]);
+    tSheet.appendRow(["นางสาวชูติเมต อุทธา"]);
+    tSheet.appendRow(["นางสาวภคอร จันทะเวช"]);
+  }
+  if (!ss.getSheetByName(SHEET_BOOKINGS)) {
+    const bSheet = ss.insertSheet(SHEET_BOOKINGS);
+    bSheet.appendRow(["ID", "Date", "Period", "Teacher", "Subject", "Level", "Room", "PDF Name", "Google Drive URL", "Timestamp"]);
+  }
+}
+
+function formatDate(dateVal) {
+  if (dateVal instanceof Date) {
+    return Utilities.formatDate(dateVal, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  }
+  return String(dateVal);
+}`;
+
+        // Initialize App on Window Load
+        window.addEventListener('DOMContentLoaded', () => {
+            // Fill level options (ม.1/1 - ม.6/4)
+            const levelSelect = document.getElementById('booking-level');
+            levels.forEach(lvl => {
                 const opt = document.createElement('option');
-                opt.value = teacher;
-                opt.textContent = teacher;
-                opt.className = "py-2 px-3 hover:bg-slate-50 cursor-pointer text-slate-700 transition-colors";
-                select.appendChild(opt);
+                opt.value = lvl;
+                opt.textContent = lvl;
+                levelSelect.appendChild(opt);
             });
 
-            document.getElementById('total-teachers-count').innerText = `${teachersList.length} คน`;
-        };
+            // Set code block text
+            document.getElementById('apps-script-code-block').value = appsScriptSourceCode;
 
-        // ==========================================
-        // SYNC DATA WITH GOOGLE SHEET API
-        // ==========================================
+            // Load Config & Pull Data
+            loadAppData();
+            lucide.createIcons();
+        });
 
-        const syncDataFromGoogleSheet = async () => {
-            const syncIcon = document.getElementById('sync-icon');
-            const statusDot = document.getElementById('api-status-dot');
-            const statusPing = document.getElementById('api-status-ping');
-            const statusText = document.getElementById('api-status-text');
+        // Toggle Tabs
+        function switchTab(tabId) {
+            const tabBooking = document.getElementById('tab-booking');
+            const tabList = document.getElementById('tab-list');
+            const btnBooking = document.getElementById('btn-tab-booking');
+            const btnList = document.getElementById('btn-tab-list');
 
-            if (!GOOGLE_SHEET_API_URL || GOOGLE_SHEET_API_URL === "") {
-                openModal(
-                    "<i class='fa-solid fa-triangle-exclamation text-amber-500 text-3xl'></i>",
-                    "ไม่ได้ระบุ Google Sheet API URL",
-                    "กรุณานำ URL ของเว็บแอปที่ได้จากการ Deploy ใน Google Apps Script มาใส่ไว้ในส่วนหัวสคริปต์ของไฟล์นี้ เพื่อใช้งานระบบออนไลน์เต็มระบบ",
-                    "bg-amber-50 text-amber-600"
-                );
+            if (tabId === 'booking') {
+                tabBooking.classList.remove('hidden');
+                tabList.classList.add('hidden');
+                btnBooking.className = "px-4 py-2 rounded-lg text-sm font-semibold transition bg-white/20 text-white shadow-sm";
+                btnList.className = "px-4 py-2 rounded-lg text-sm font-semibold transition text-teal-100 hover:bg-white/10";
+            } else {
+                tabBooking.classList.add('hidden');
+                tabList.classList.remove('hidden');
+                btnBooking.className = "px-4 py-2 rounded-lg text-sm font-semibold transition text-teal-100 hover:bg-white/10";
+                btnList.className = "px-4 py-2 rounded-lg text-sm font-semibold transition bg-white/20 text-white shadow-sm";
+                renderBookingsTable();
+            }
+        }
+
+        // Custom alert helper
+        function showCustomAlert(title, message, type = 'info') {
+            const modal = document.getElementById('alert-modal');
+            const iconContainer = document.getElementById('alert-icon-container');
+            const titleElem = document.getElementById('alert-title');
+            const messageElem = document.getElementById('alert-message');
+
+            titleElem.textContent = title;
+            messageElem.textContent = message;
+
+            if (type === 'success') {
+                iconContainer.className = "mx-auto w-12 h-12 rounded-full flex items-center justify-center bg-emerald-100 text-emerald-600";
+                iconContainer.innerHTML = `<i data-lucide="check" class="w-6 h-6"></i>`;
+            } else if (type === 'error') {
+                iconContainer.className = "mx-auto w-12 h-12 rounded-full flex items-center justify-center bg-rose-100 text-rose-600";
+                iconContainer.innerHTML = `<i data-lucide="alert-triangle" class="w-6 h-6"></i>`;
+            } else {
+                iconContainer.className = "mx-auto w-12 h-12 rounded-full flex items-center justify-center bg-blue-100 text-blue-600";
+                iconContainer.innerHTML = `<i data-lucide="info" class="w-6 h-6"></i>`;
+            }
+
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeAlert() {
+            document.getElementById('alert-modal').classList.add('hidden');
+        }
+
+        // Config Modal Functions
+        function openConfigModal() {
+            document.getElementById('google-sheet-url').value = configAppsScriptUrl;
+            document.getElementById('config-modal').classList.remove('hidden');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('config-modal').classList.add('hidden');
+        }
+
+        function copyAppsScriptCode() {
+            const block = document.getElementById('apps-script-code-block');
+            block.select();
+            document.execCommand('copy');
+            showCustomAlert('คัดลอกสำเร็จ', 'สามารถนำโค้ดในคลิปบอร์ดไปจัดวางใน Apps Script ของคุณได้ทันที', 'success');
+        }
+
+        function saveConfig() {
+            const inputUrl = document.getElementById('google-sheet-url').value.trim();
+            if (inputUrl && !inputUrl.startsWith('https://')) {
+                showCustomAlert('ลิงก์ไม่ถูกต้อง', 'กรุณาใส่ลิงก์ที่เริ่มต้นด้วย https://', 'error');
                 return;
             }
 
-            // Syncing UI state
-            syncIcon.classList.add('fa-spin');
-            statusDot.className = "relative inline-flex rounded-full h-3 w-3 bg-amber-500";
-            statusPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75";
-            statusText.innerText = "กำลังซิงค์ข้อมูลจากคลาวด์ชีต...";
+            configAppsScriptUrl = inputUrl;
+            localStorage.setItem('supervision_gas_url_v2', inputUrl);
+            closeConfigModal();
+            loadAppData();
+        }
 
-            try {
-                const response = await fetch(GOOGLE_SHEET_API_URL);
-                if (!response.ok) throw new Error("HTTP error " + response.status);
+        // Sync with Google Sheet or fallback to Local Storage
+        async function loadAppData() {
+            const connStatus = document.getElementById('connection-status');
+            const successStatus = document.getElementById('success-status');
+
+            if (configAppsScriptUrl) {
+                connStatus.classList.add('hidden');
+                successStatus.classList.remove('hidden');
                 
-                const responseData = await response.json();
-                
-                if (responseData.status === "success") {
-                    // Update teachers
-                    if (responseData.teachers && responseData.teachers.length > 0) {
-                        appState.teachers = responseData.teachers;
-                        localStorage.setItem('class_teachers', JSON.stringify(appState.teachers));
-                        renderTeachersDropdown(appState.teachers);
+                try {
+                    const response = await fetch(configAppsScriptUrl, { method: 'GET' });
+                    const result = await response.json();
+                    if (result.success) {
+                        teachersList = result.teachers && result.teachers.length > 0 ? result.teachers : mockTeachers;
+                        bookings = result.bookings || [];
+                    } else {
+                        throw new Error(result.message || 'Error executing script');
                     }
-
-                    // Update bookings history
-                    if (responseData.bookings) {
-                        appState.bookings = responseData.bookings;
-                        localStorage.setItem('class_supervisions', JSON.stringify(appState.bookings));
-                    }
-
-                    // Success UI State
-                    statusDot.className = "relative inline-flex rounded-full h-3 w-3 bg-emerald-500";
-                    statusPing.className = "";
-                    statusText.innerText = "เชื่อมต่อและดึงข้อมูลจาก Google Sheet สำเร็จเรียบร้อย";
-                    
-                    updateTotalCount();
-                    renderBookingsTable();
-                    renderPeriodSlots();
-                    appState.calendarInstance.redraw();
-                    
-                    openModal(
-                        "<i class='fa-solid fa-cloud-arrow-down text-emerald-600 text-3xl'></i>",
-                        "ซิงค์ข้อมูลสำเร็จ",
-                        "ระบบทำการเชื่อมโยงข้อมูลและประวัติการจอง พร้อมอัปเดตรายชื่อครูจาก Google Sheets เรียบร้อยแล้ว",
-                        "bg-emerald-50 text-emerald-600"
-                    );
-
-                } else {
-                    throw new Error(responseData.message || "Failed execution query");
+                } catch (error) {
+                    console.error('Error fetching Google Sheet:', error);
+                    showCustomAlert('กำลังเข้าสู่โหมดทดลอง', 'ไม่สามารถเชื่อมโยง API ของ Google Sheet ได้ชั่วคราว ระบบสลับเข้าสู่โหมดจำลองเพื่อให้ทดสอบบนอุปกรณ์นี้ได้', 'info');
+                    useFallbackLocalData();
                 }
-
-            } catch (error) {
-                console.error("Sheet sync error:", error);
-                
-                // Keep local fallbacks
-                statusDot.className = "relative inline-flex rounded-full h-3 w-3 bg-red-500";
-                statusPing.className = "";
-                statusText.innerText = "การเชื่อมต่อคลาวด์มีปัญหา (ทำงานโหมด Offline สำรอง)";
-
-                openModal(
-                    "<i class='fa-solid fa-circle-xmark text-rose-500 text-3xl'></i>",
-                    "ไม่สามารถซิงค์ชีตได้",
-                    "เกิดข้อผิดพลาดในการเชื่อมโยงข้อมูลกับเว็บเซิร์ฟเวอร์ กรุณาตรวจสอบการตั้งค่า CORS / การสิทธิ์เข้าถึงประเภทเว็บแอปของคุณ: " + error.message,
-                    "bg-rose-50 text-rose-600"
-                );
-            } finally {
-                syncIcon.classList.remove('fa-spin');
+            } else {
+                connStatus.classList.remove('hidden');
+                successStatus.classList.add('hidden');
+                useFallbackLocalData();
             }
-        };
 
-        // Load initial data settings
-        const loadInitialData = () => {
-            // Load bookings
-            const storedBookings = localStorage.getItem('class_supervisions');
+            renderTeacherDropdown();
+            selectDefaultDate();
+            renderCalendar();
+            renderPeriodGrid();
+        }
+
+        function useFallbackLocalData() {
+            teachersList = mockTeachers;
+            const storedBookings = localStorage.getItem('local_bookings_v3');
             if (storedBookings) {
-                appState.bookings = JSON.parse(storedBookings);
+                bookings = JSON.parse(storedBookings);
             } else {
-                // Populate default fake entries to showcase calendar features & protection
-                appState.bookings = [
-                    {
-                        id: "booking-1",
-                        date: "2026-07-02",
-                        period: 3,
-                        teacherName: "นายกษิดิ์เดช พันธุ์งาม",
-                        subject: "คณิตศาสตร์เพิ่มเติม (ค31201)",
-                        classLevel: "ม.4/1",
-                        classroom: "ห้อง 421",
-                        pdfFileName: "แผนการสอนคณิตศาสตร์_ม4.pdf",
-                        pdfFileData: "dummy_base64_data",
-                        timestamp: new Date("2026-06-25").toLocaleString()
-                    },
-                    {
-                        id: "booking-2",
-                        date: "2026-07-15",
-                        period: 5,
-                        teacherName: "นางพิมลมาศ เสนอวงศ์",
-                        subject: "วิชาวิทยาศาสตร์โครงสร้าง (ว21102)",
-                        classLevel: "ม.1/2",
-                        classroom: "ห้องวิทยาศาสตร์ 3",
-                        pdfFileName: "",
-                        pdfFileData: "",
-                        timestamp: new Date("2026-06-26").toLocaleString()
-                    }
-                ];
-                localStorage.setItem('class_supervisions', JSON.stringify(appState.bookings));
+                bookings = [...mockBookings];
+                localStorage.setItem('local_bookings_v3', JSON.stringify(bookings));
+            }
+        }
+
+        // Render Teacher Dropdown
+        function renderTeacherDropdown() {
+            const teacherSelect = document.getElementById('booking-teacher');
+            teacherSelect.innerHTML = '<option value="" disabled selected>-- เลือกรายชื่อครู --</option>';
+            teachersList.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = t;
+                teacherSelect.appendChild(opt);
+            });
+        }
+
+        function selectDefaultDate() {
+            const today = new Date();
+            const currentMonthReal = today.getMonth() + 1;
+            const currentYearReal = today.getFullYear();
+            
+            if (currentYearReal === 2026 && (currentMonthReal === 7 || currentMonthReal === 8)) {
+                currentMonth = currentMonthReal;
+                selectedDate = formatDateToString(today);
+            } else {
+                currentMonth = 7; // Default to July
+                selectedDate = "2026-07-01";
+            }
+            
+            selectedPeriod = null;
+            updateSelectedLabels();
+        }
+
+        function updateSelectedLabels() {
+            const displayDate = selectedDate ? thaiFormatDate(selectedDate) : "--/--/----";
+            document.getElementById('selected-date-label').textContent = displayDate;
+            document.getElementById('form-display-date').value = displayDate;
+
+            const pField = document.getElementById('form-display-period');
+            if (selectedPeriod) {
+                pField.value = `คาบที่ ${selectedPeriod}`;
+                pField.classList.remove('placeholder-rose-400');
+            } else {
+                pField.value = "";
+                pField.placeholder = "กรุณาเลือกคาบเรียน";
+            }
+        }
+
+        // Calendar Render Logic
+        function changeMonth(monthNum) {
+            currentMonth = monthNum;
+            const btnJuly = document.getElementById('btn-july');
+            const btnAugust = document.getElementById('btn-august');
+
+            if (monthNum === 7) {
+                btnJuly.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition bg-white text-teal-700 shadow-sm";
+                btnAugust.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition text-slate-600 hover:text-slate-800";
+            } else {
+                btnJuly.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition text-slate-600 hover:text-slate-800";
+                btnAugust.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition bg-white text-teal-700 shadow-sm";
             }
 
-            // Load Teachers List
-            const storedTeachers = localStorage.getItem('class_teachers');
-            if (storedTeachers) {
-                appState.teachers = JSON.parse(storedTeachers);
-            } else {
-                appState.teachers = DEFAULT_TEACHERS;
-                localStorage.setItem('class_teachers', JSON.stringify(appState.teachers));
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-days');
+            grid.innerHTML = "";
+
+            const firstDayOfMonth = new Date(currentYear, currentMonth - 1, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = "py-3";
+                grid.appendChild(emptyCell);
             }
 
-            updateTotalCount();
-            renderTeachersDropdown(appState.teachers);
-        };
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateString = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dateObj = new Date(currentYear, currentMonth - 1, day);
+                const dayOfWeek = dateObj.getDay();
+                const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+                
+                const btn = document.createElement('button');
+                btn.type = "button";
+                btn.onclick = () => selectDate(dateString, isWeekend);
 
-        // Update total counters
-        const updateTotalCount = () => {
-            document.getElementById('total-bookings-count').innerText = `${appState.bookings.length} รายการ`;
-        };
+                let dayStyles = "py-2.5 text-xs font-semibold rounded-xl transition relative flex flex-col items-center justify-center focus:outline-none ";
+                let indicatorHTML = "";
 
-        // ==========================================
-        // CALENDAR IMPLEMENTATION
-        // ==========================================
+                const todayStr = formatDateToString(new Date());
+                const isToday = (dateString === todayStr);
 
-        const initCalendar = () => {
-            appState.calendarInstance = flatpickr("#inline-calendar", {
-                inline: true,
-                locale: "th",
-                dateFormat: "Y-m-d",
-                minDate: "2026-07-01",
-                maxDate: "2026-08-31",
-                defaultDate: "2026-07-01",
-                onChange: function(selectedDates, dateStr, instance) {
-                    if (selectedDates.length > 0) {
-                        selectBookingDate(dateStr);
+                const dayBookings = bookings.filter(b => b.date === dateString);
+                const totalActivePeriods = 8; // 1-9 periods minus period 5 (lunch break)
+                const isDateSelected = (selectedDate === dateString);
+
+                if (isWeekend) {
+                    dayStyles += "bg-slate-100 text-slate-400 cursor-not-allowed";
+                } else {
+                    if (isDateSelected) {
+                        dayStyles += "bg-teal-100 text-teal-800 ring-2 ring-teal-500/80 border-teal-300";
+                    } else if (isToday) {
+                        dayStyles += "bg-teal-600 text-white shadow-sm";
+                    } else if (dayBookings.length === 0) {
+                        dayStyles += "bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/60 shadow-xs";
+                    } else if (dayBookings.length >= totalActivePeriods) {
+                        dayStyles += "bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200";
+                    } else {
+                        dayStyles += "bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200";
                     }
-                },
-                onDayCreate: function(dObj, dStr, fp, dayElem) {
-                    const formattedDate = formatDayToYYYYMMDD(dayElem.dateObj);
-                    const bookingCount = appState.bookings.filter(b => b.date === formattedDate).length;
-                    
-                    if (bookingCount > 0) {
-                        const badge = document.createElement("span");
-                        badge.className = `absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full ${bookingCount >= 4 ? 'bg-rose-500' : 'bg-indigo-500'}`;
-                        dayElem.appendChild(badge);
-                        dayElem.title = `จองแล้ว ${bookingCount} คาบ`;
+
+                    if (dayBookings.length > 0) {
+                        indicatorHTML = `<span class="absolute bottom-1 w-1.5 h-1.5 rounded-full ${dayBookings.length >= totalActivePeriods ? 'bg-rose-500' : 'bg-amber-500'}"></span>`;
                     }
                 }
-            });
 
-            selectBookingDate("2026-07-01");
-        };
-
-        const formatDayToYYYYMMDD = (dateObj) => {
-            const year = dateObj.getFullYear();
-            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const day = String(dateObj.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        };
-
-        const formatThaiDate = (dateStr) => {
-            if (!dateStr) return "ยังไม่ได้เลือก";
-            const parts = dateStr.split('-');
-            const year = parseInt(parts[0]) + 543;
-            const day = parseInt(parts[2]);
-            const months = [
-                "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-                "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-            ];
-            const monthText = months[parseInt(parts[1]) - 1];
-            return `${day} ${monthText} ${year}`;
-        };
-
-        const selectBookingDate = (dateStr) => {
-            appState.selectedDate = dateStr;
-            document.getElementById('selected-date-display').innerText = formatThaiDate(dateStr);
-            document.getElementById('booking-date').value = formatThaiDate(dateStr);
-            
-            renderPeriodSlots();
-            checkDoubleBooking();
-        };
-
-        // ==========================================
-        // TEACHER SEARCH INTERACTION
-        // ==========================================
-        
-        const filterTeachers = () => {
-            const query = document.getElementById('teacher-search').value.toLowerCase();
-            const select = document.getElementById('teacher-select');
-            select.innerHTML = '';
-            
-            const filtered = appState.teachers.filter(name => name.toLowerCase().includes(query));
-            
-            if (filtered.length === 0) {
-                const opt = document.createElement('option');
-                opt.disabled = true;
-                opt.textContent = "ไม่พบชื่อครูที่คุณต้องการค้นหา";
-                opt.className = "py-2 px-3 text-slate-400 text-xs italic";
-                select.appendChild(opt);
-            } else {
-                filtered.sort().forEach(teacher => {
-                    const opt = document.createElement('option');
-                    opt.value = teacher;
-                    opt.textContent = teacher;
-                    opt.className = "py-2 px-3 hover:bg-slate-50 cursor-pointer text-slate-700 transition-colors";
-                    select.appendChild(opt);
-                });
+                btn.className = dayStyles;
+                btn.innerHTML = `<span class="${isDateSelected ? 'font-bold' : ''}">${day}</span>${indicatorHTML}`;
+                grid.appendChild(btn);
             }
-        };
+        }
 
-        const selectTeacherFromList = () => {
-            const select = document.getElementById('teacher-select');
-            if (select.value) {
-                document.getElementById('teacher-search').value = select.value;
+        function selectDate(dateStr, isWeekend) {
+            if (isWeekend) {
+                showCustomAlert('วันหยุดเสาร์-อาทิตย์', 'กรุณาจองวันจัดกิจกรรมนิเทศการสอนเฉพาะในวันเปิดเรียนทำการปกติเท่านั้นค่ะ', 'error');
+                return;
             }
-        };
+            selectedDate = dateStr;
+            selectedPeriod = null; 
+            updateSelectedLabels();
+            renderCalendar();
+            renderPeriodGrid();
+        }
 
-        // ==========================================
-        // SLOT GRID VIEW AND REAL-TIME CHECKER
-        // ==========================================
+        // Render Periods Grid for the selected day
+        function renderPeriodGrid() {
+            const container = document.getElementById('period-status-grid');
+            container.innerHTML = "";
 
-        const renderPeriodSlots = () => {
-            const container = document.getElementById('periods-grid-container');
-            container.innerHTML = '';
+            if (!selectedDate) {
+                container.innerHTML = `<div class="col-span-full py-6 text-center text-slate-400 text-xs">กรุณาเลือกวันบนปฏิทิน</div>`;
+                return;
+            }
 
-            const dayBookings = appState.bookings.filter(b => b.date === appState.selectedDate);
+            const dayBookings = bookings.filter(b => b.date === selectedDate);
 
-            for (let p = 1; p <= 9; p++) {
-                const meta = PERIODS_METADATA[p];
-                const bookingInPeriod = dayBookings.find(b => b.period == p);
-                const periodCard = document.createElement('div');
+            periodTimes.forEach(p => {
+                const card = document.createElement('div');
+                const isBooked = dayBookings.find(b => b.period === p.period);
                 
-                if (bookingInPeriod) {
-                    // Booked
-                    periodCard.className = "bg-rose-50 border border-rose-200 rounded-2xl p-3.5 text-center text-rose-800 shadow-sm relative group transition-all";
-                    periodCard.innerHTML = `
-                        <p class="font-bold text-xs">คาบที่ ${p}</p>
-                        <p class="text-[11px] text-slate-500 font-medium">${meta.start} - ${meta.end} น.</p>
-                        <span class="inline-block px-2.5 py-0.5 bg-rose-600 text-white rounded-full text-[9px] font-bold mt-2">
-                            จองเต็มแล้ว
-                        </span>
-                        
-                        <!-- Tooltip with booked detail -->
-                        <div class="absolute z-10 bottom-full left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-[10px] rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-48 shadow-xl mb-1 text-left leading-relaxed">
-                            <span class="font-bold text-amber-300">ครูผู้จอง:</span> ${bookingInPeriod.teacherName}<br>
-                            <span class="font-bold text-amber-300">วิชา:</span> ${bookingInPeriod.subject} (${bookingInPeriod.classLevel})<br>
-                            <span class="font-bold text-amber-300">สถานที่:</span> ${bookingInPeriod.classroom}
+                let cardClass = "p-3.5 rounded-xl border text-left transition relative flex flex-col justify-between ";
+                let actionHTML = "";
+
+                if (p.isLunch) {
+                    cardClass += "bg-slate-50 border-slate-200/80 text-slate-400";
+                    actionHTML = `<span class="text-[10px] text-slate-400 font-medium">ปิดระบบจอง (พักกลางวัน)</span>`;
+                } else if (isBooked) {
+                    cardClass += "bg-rose-50/60 border-rose-100 text-rose-800";
+                    actionHTML = `
+                        <div class="mt-2 text-[11px] font-medium leading-tight">
+                            <span class="block font-bold truncate">${isBooked.teacher}</span>
+                            <span class="block text-rose-500 truncate text-[10px]">${isBooked.subject} (${isBooked.level})</span>
                         </div>
                     `;
                 } else {
-                    // Available
-                    const isLunch = p === 5;
-                    const cardBg = isLunch ? "bg-amber-50/50 hover:bg-amber-100/50 border-amber-200" : "bg-emerald-50/50 hover:bg-emerald-100/70 border-emerald-200";
-                    const badgeBg = isLunch ? "bg-amber-600" : "bg-emerald-600";
-                    const badgeText = isLunch ? "พักกลางวัน" : "ว่าง / ว่างจอง";
-
-                    periodCard.className = `${cardBg} border rounded-2xl p-3.5 text-center cursor-pointer transition-all shadow-sm`;
-                    periodCard.innerHTML = `
-                        <p class="font-bold text-xs text-slate-800">คาบที่ ${p}</p>
-                        <p class="text-[11px] text-slate-500 font-medium">${meta.start} - ${meta.end} น.</p>
-                        <span class="inline-block px-2.5 py-0.5 ${badgeBg} text-white rounded-full text-[9px] font-bold mt-2">
-                            ${badgeText}
-                        </span>
-                    `;
-                    periodCard.onclick = () => {
-                        document.getElementById('booking-period').value = p;
-                        checkDoubleBooking();
-                    };
+                    const isCurrentSelection = (selectedPeriod === p.period);
+                    if (isCurrentSelection) {
+                        cardClass += "bg-teal-50 border-teal-500 shadow-xs ring-1 ring-teal-500 cursor-pointer";
+                    } else {
+                        cardClass += "bg-white border-slate-200 hover:border-teal-300 hover:shadow-xs cursor-pointer";
+                    }
+                    
+                    card.onclick = () => selectPeriod(p.period);
+                    actionHTML = `<span class="mt-3 text-[10px] ${isCurrentSelection ? 'text-teal-600 font-bold' : 'text-emerald-600 font-semibold'} flex items-center gap-1">
+                        <i data-lucide="${isCurrentSelection ? 'check-circle' : 'circle'}" class="w-3.5 h-3.5"></i>
+                        ${isCurrentSelection ? 'เลือกอยู่' : 'ว่าง - กดเพื่อจอง'}
+                    </span>`;
                 }
-                container.appendChild(periodCard);
-            }
-        };
 
-        const checkDoubleBooking = () => {
-            const periodSelect = document.getElementById('booking-period');
-            const selectedPeriod = periodSelect.value;
-            const statusAlert = document.getElementById('period-status-alert');
-            const submitBtn = document.getElementById('btn-submit-booking');
+                card.className = cardClass;
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xs ${p.isLunch ? 'text-slate-400' : 'text-slate-800'}">${p.label}</span>
+                            <span class="text-[10px] text-slate-500 font-mono">${p.time}</span>
+                        </div>
+                    </div>
+                    ${actionHTML}
+                `;
+                container.appendChild(card);
+            });
 
-            if (!appState.selectedDate || !selectedPeriod) {
-                statusAlert.className = "mt-1.5 text-xs hidden";
-                submitBtn.disabled = false;
-                submitBtn.className = "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg transition-all duration-150 flex items-center justify-center space-x-2";
-                return;
-            }
+            lucide.createIcons();
+        }
 
-            const doubleBooking = appState.bookings.find(
-                b => b.date === appState.selectedDate && b.period == selectedPeriod
-            );
+        function selectPeriod(periodNum) {
+            selectedPeriod = periodNum;
+            updateSelectedLabels();
+            renderPeriodGrid();
+        }
 
-            if (doubleBooking) {
-                statusAlert.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> มีคิวจองนิเทศแล้วโดย: <strong>${doubleBooking.teacherName}</strong> (${doubleBooking.subject})`;
-                statusAlert.className = "mt-1.5 text-xs text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200 block leading-relaxed";
-                
-                submitBtn.disabled = true;
-                submitBtn.className = "w-full bg-slate-300 text-slate-500 font-bold py-3.5 px-4 rounded-2xl cursor-not-allowed flex items-center justify-center space-x-2 shadow-none";
-            } else {
-                const isLunch = selectedPeriod == 5;
-                const activeColor = isLunch ? "text-amber-700 bg-amber-50 border-amber-200" : "text-emerald-700 bg-emerald-50 border-emerald-200";
-                const activeText = isLunch ? "คาบที่ 5 เป็นคาบพักกลางวัน สามารถจองจัดกิจกรรมการเรียนรู้แบบนิเทศได้กรณีพิเศษ" : "คาบเรียนนี้ว่าง สามารถส่งเรื่องบันทึกจองระบบได้";
+        // ====================================================
+        // NEW WORKFLOW: UPLOAD PDF MODAL LOGIC (แนบไฟล์ย้อนหลัง)
+        // ====================================================
+        function openUploadPDFModal(bookingId, teacherName, subjectName) {
+            activeUploadId = bookingId;
+            document.getElementById('upload-modal-teacher').textContent = teacherName;
+            document.getElementById('upload-modal-subject').textContent = subjectName;
+            
+            // เคลียร์ค่าค้างเก่า
+            clearModalFileSelection();
+            
+            document.getElementById('upload-pdf-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
 
-                statusAlert.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> ${activeText}`;
-                statusAlert.className = `mt-1.5 text-xs ${activeColor} p-2.5 rounded-xl border block leading-relaxed`;
-                
-                submitBtn.disabled = false;
-                submitBtn.className = "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg transition-all duration-150 flex items-center justify-center space-x-2";
-            }
-        };
+        function closeUploadPDFModal() {
+            document.getElementById('upload-pdf-modal').classList.add('hidden');
+            activeUploadId = null;
+        }
 
-        // ==========================================
-        // FILE SYSTEM ATTACHMENT (PDF -> BASE64)
-        // ==========================================
-
-        const handleFileSelected = (event) => {
-            const file = event.target.files[0];
-            const nameDisplay = document.getElementById('file-name-display');
-            const icon = document.getElementById('pdf-icon');
-
-            if (!file) {
-                nameDisplay.className = "text-xs text-emerald-600 font-bold mt-2 hidden";
-                appState.uploadedPdfBase64 = null;
-                appState.uploadedPdfName = null;
-                return;
-            }
-
-            if (file.type !== "application/pdf") {
-                openModal(
-                    "<i class='fa-solid fa-triangle-exclamation text-rose-500 text-3xl'></i>",
-                    "รูปแบบไฟล์ไม่รองรับ",
-                    "กรุณาตรวจสอบประเภทไฟล์ ระบบนิเทศรองรับเฉพาะไฟล์แนบแผนการเรียนการสอนนามสกุล PDF เท่านั้น",
-                    "bg-rose-50 text-rose-600"
-                );
-                document.getElementById('pdf-file').value = "";
-                nameDisplay.className = "text-xs text-emerald-600 font-bold mt-2 hidden";
-                appState.uploadedPdfBase64 = null;
-                appState.uploadedPdfName = null;
-                return;
-            }
-
-            if (file.size > 5 * 1024 * 1024) { // 5MB
-                openModal(
-                    "<i class='fa-solid fa-weight-hanging text-amber-500 text-3xl'></i>",
-                    "ขนาดไฟล์ใหญ่เกินกำหนด",
-                    "โปรดบีบอัดแผนการเรียนรู้ PDF ของท่านให้มีขนาดไม่เกิน 5MB แล้วจึงทดลองอัปโหลดใหม่",
-                    "bg-amber-50 text-amber-600"
-                );
-                document.getElementById('pdf-file').value = "";
-                nameDisplay.className = "text-xs text-emerald-600 font-bold mt-2 hidden";
-                appState.uploadedPdfBase64 = null;
-                appState.uploadedPdfName = null;
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                appState.uploadedPdfBase64 = e.target.result;
-                appState.uploadedPdfName = file.name;
-                
-                nameDisplay.innerText = `แนบไฟล์สำเร็จ: ${file.name}`;
-                nameDisplay.className = "text-xs text-emerald-600 font-bold mt-2 block";
-                icon.className = "fa-solid fa-file-circle-check text-3xl text-emerald-500 mb-2";
-            };
-            reader.readAsDataURL(file);
-        };
-
-        // ==========================================
-        // ACTION: TABLE ATTACH FILE LATER (UPLOADS TO GOOGLE DRIVE)
-        // ==========================================
-
-        const openTableFileUpload = (bookingId) => {
-            appState.tableUploadTargetId = bookingId;
-            document.getElementById('table-pdf-file-input').click();
-        };
-
-        const handleTableFileSelected = (event) => {
-            const file = event.target.files[0];
+        function handleModalFileSelect(e) {
+            const file = e.target.files[0];
             if (!file) return;
 
             if (file.type !== "application/pdf") {
-                openModal(
-                    "<i class='fa-solid fa-triangle-exclamation text-rose-500 text-3xl'></i>",
-                    "รูปแบบไฟล์ไม่รองรับ",
-                    "กรุณาตรวจสอบประเภทไฟล์ ระบบนิเทศรองรับเฉพาะไฟล์แนบแผนการเรียนการสอนนามสกุล PDF เท่านั้น",
-                    "bg-rose-50 text-rose-600"
-                );
-                event.target.value = "";
+                showCustomAlert('ประเภทไฟล์ไม่ถูกต้อง', 'กรุณาอัปโหลดเฉพาะไฟล์ PDF (.pdf) เท่านั้นครับ', 'error');
+                clearModalFileSelection();
                 return;
             }
 
-            if (file.size > 5 * 1024 * 1024) { // 5MB
-                openModal(
-                    "<i class='fa-solid fa-weight-hanging text-amber-500 text-3xl'></i>",
-                    "ขนาดไฟล์ใหญ่เกินกำหนด",
-                    "โปรดบีบอัดแผนการเรียนรู้ PDF ของท่านให้มีขนาดไม่เกิน 5MB แล้วจึงทดลองอัปโหลดใหม่อีกครั้ง",
-                    "bg-amber-50 text-amber-600"
-                );
-                event.target.value = "";
+            if (file.size > 4 * 1024 * 1024) { 
+                showCustomAlert('ไฟล์มีขนาดใหญ่เกินไป', 'กรุณาอัปโหลดไฟล์ PDF ขนาดไม่เกิน 4MB เพื่อป้องกันปัญหาเรื่องความเร็วในการส่งข้อมูล', 'error');
+                clearModalFileSelection();
                 return;
             }
-
-            // แสดงหน้ากาก Loading ระหว่างส่งไฟล์ไปที่ Google Drive
-            openModal(
-                "<i class='fa-solid fa-spinner animate-spin text-indigo-600 text-3xl'></i>",
-                "กำลังอัปโหลดไฟล์",
-                "ระบบกำลังอัปโหลดไฟล์แผนการสอนของคุณครูไปยัง Google Drive และอัปเดตระบบสารสนเทศ...",
-                "bg-indigo-50 text-indigo-600"
-            );
 
             const reader = new FileReader();
-            reader.onload = async function(e) {
-                const base64Data = e.target.result;
-                const fileName = file.name;
-
-                const bookingIndex = appState.bookings.findIndex(b => b.id === appState.tableUploadTargetId);
-                if (bookingIndex !== -1) {
-                    let driveFileUrl = base64Data; // Default fallback to Base64 local if offline
-
-                    // จัดส่งไฟล์ขึ้น Google Drive ผ่าน Google Web App API
-                    if (GOOGLE_SHEET_API_URL && GOOGLE_SHEET_API_URL !== "") {
-                        try {
-                            const res = await fetch(GOOGLE_SHEET_API_URL, {
-                                method: "POST",
-                                body: JSON.stringify({
-                                    action: "update_pdf",
-                                    id: appState.tableUploadTargetId,
-                                    date: appState.bookings[bookingIndex].date,
-                                    period: appState.bookings[bookingIndex].period,
-                                    pdfFileName: fileName,
-                                    pdfFileData: base64Data // ส่ง Base64 ไปสร้างไฟล์ PDF ใน Google Drive
-                                })
-                            });
-                            
-                            const result = await res.json();
-                            if (result.status === "success" && result.fileUrl) {
-                                driveFileUrl = result.fileUrl; // รับลิ้งก์ดาวน์โหลดของ Google Drive จริงมาแทนที่ Base64 ขนาดใหญ่
-                            }
-                        } catch (error) {
-                            console.error("Failed to upload post-attachment to Google Drive", error);
-                        }
-                    }
-
-                    // อัปเดตข้อมูลในสเตต
-                    appState.bookings[bookingIndex].pdfFileName = fileName;
-                    appState.bookings[bookingIndex].pdfFileData = driveFileUrl;
-                    
-                    // เซฟข้อมูลประวัติลง Local Cache
-                    localStorage.setItem('class_supervisions', JSON.stringify(appState.bookings));
-                    renderBookingsTable();
-
-                    closeModal(); // ปิด Modal โหลดของเก่าก่อน
-                    setTimeout(() => {
-                        openModal(
-                            "<i class='fa-solid fa-circle-check text-2xl'></i>",
-                            "แนบไฟล์ลง Google Drive สำเร็จ",
-                            `ไฟล์แผนการสอน "${fileName}" ได้รับการจัดเก็บลงระบบ Google Drive ของโรงเรียนและผูกลิงก์ดาวน์โหลดเรียบร้อยแล้ว`,
-                            "bg-emerald-50 text-emerald-600"
-                        );
-                    }, 300);
-                }
-                event.target.value = ""; // รีเซ็ต input file
+            reader.onload = function(evt) {
+                modalBase64PDF = evt.target.result;
+                modalPDFName = file.name;
+                
+                document.getElementById('modal-dropzone-empty').classList.add('hidden');
+                document.getElementById('modal-dropzone-filled').classList.remove('hidden');
+                document.getElementById('modal-pdf-name-label').textContent = file.name;
             };
             reader.readAsDataURL(file);
-        };
+        }
 
-        // ==========================================
-        // CORE WORKFLOW: FORM SUBMISSION (SAVES PDF IN DRIVE)
-        // ==========================================
+        function clearModalFileSelection(e) {
+            if (e) e.stopPropagation();
+            modalBase64PDF = "";
+            modalPDFName = "";
+            document.getElementById('modal-booking-pdf').value = "";
+            document.getElementById('modal-dropzone-empty').classList.remove('hidden');
+            document.getElementById('modal-dropzone-filled').classList.add('hidden');
+        }
 
-        const handleFormSubmit = async (event) => {
-            event.preventDefault();
+        // ดักจับเหตุการณ์การกด Dropzone ใน Modal
+        document.getElementById('modal-dropzone').addEventListener('click', () => {
+            if (!modalBase64PDF) {
+                document.getElementById('modal-booking-pdf').click();
+            }
+        });
 
-            const teacherName = document.getElementById('teacher-search').value.trim();
-            const period = document.getElementById('booking-period').value;
-            const subject = document.getElementById('subject-name').value.trim();
-            const classLevel = document.getElementById('class-level').value;
-            const classroom = document.getElementById('classroom-no').value.trim();
+        // ฟังก์ชันอัปโหลด PDF ไปยังสคริปต์หลังบ้าน
+        async function submitModalPDF() {
+            if (!activeUploadId) return;
 
-            if (!appState.selectedDate) {
-                openModal("<i class='fa-solid fa-triangle-exclamation text-rose-500 text-3xl'></i>", "ไม่ได้เลือกวัน", "กรุณาคลิกเลือกวันที่บนตัวปฏิทินซ้ายมือเพื่อกำหนดคิวจองนิเทศ", "bg-rose-50 text-rose-600");
+            if (!modalBase64PDF) {
+                showCustomAlert('ไม่พบไฟล์แนบ', 'กรุณาทำการเลือกไฟล์แผนการสอน PDF ก่อนกดบันทึก', 'error');
                 return;
             }
 
-            if (!teacherName || !appState.teachers.includes(teacherName)) {
-                openModal("<i class='fa-solid fa-user-xmark text-rose-500 text-3xl'></i>", "ข้อมูลครูไม่มีในระบบ", "โปรดพิมพ์เพื่อหาและคลิกเลือกจากรายการรายชื่อครูที่มีในเมนูด้านล่างช่องพิมพ์เพื่อความแม่นยำทางระบบ", "bg-rose-50 text-rose-600");
-                return;
-            }
+            const btnSubmit = document.getElementById('btn-submit-pdf');
+            const originalBtnHTML = btnSubmit.innerHTML;
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<span class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent inline-block mr-1"></span> กำลังอัปโหลด...`;
 
-            const duplicateCheck = appState.bookings.find(b => b.date === appState.selectedDate && b.period == period);
-            if (duplicateCheck) {
-                openModal("<i class='fa-solid fa-circle-xmark text-rose-500 text-3xl'></i>", "จองซ้ำซ้อน", "ช่วงเวลาที่เลือกมีท่านอื่นทำรายการสำเร็จตัดหน้าไปแล้ว กรุณาเลือกคาบหรือวันอื่นรับตรวจ", "bg-rose-50 text-rose-600");
-                return;
-            }
-
-            const newBooking = {
-                id: "booking-" + Date.now(),
-                date: appState.selectedDate,
-                period: parseInt(period),
-                teacherName: teacherName,
-                subject: subject,
-                classLevel: classLevel,
-                classroom: classroom,
-                pdfFileName: appState.uploadedPdfName ? appState.uploadedPdfName : "",
-                pdfFileData: appState.uploadedPdfBase64 ? appState.uploadedPdfBase64 : "", // ส่งขึ้นคลาวด์ไปก่อนเพื่อเตรียมแปลงลง Drive
-                timestamp: new Date().toLocaleString('th-TH')
+            const payload = {
+                action: "uploadPDF",
+                id: activeUploadId,
+                pdfName: modalPDFName,
+                pdfData: modalBase64PDF
             };
 
-            const submitBtn = document.getElementById('btn-submit-booking');
-            const originalBtnHtml = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>กำลังจัดส่งและสร้างไฟล์ใน Google Drive...</span>`;
-
-            if (GOOGLE_SHEET_API_URL && GOOGLE_SHEET_API_URL !== "") {
+            if (configAppsScriptUrl) {
                 try {
-                    const response = await fetch(GOOGLE_SHEET_API_URL, {
-                        method: "POST",
-                        body: JSON.stringify(newBooking)
+                    const response = await fetch(configAppsScriptUrl, {
+                        method: 'POST',
+                        redirect: 'follow',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8',
+                        },
+                        body: JSON.stringify(payload)
                     });
-                    
                     const result = await response.json();
-                    if (result.status === "success") {
-                        // ดึงข้อมูล File URL ลิ้งก์ของ Google Drive จริงจากผลลัพธ์มาเซฟเก็บไว้แทน Base64 ต้นฉบับ
-                        if (result.fileUrl) {
-                            newBooking.pdfFileData = result.fileUrl;
-                        }
-                        saveBookingToLocal(newBooking);
-                        showSuccessFlow();
+                    
+                    if (result.success) {
+                        showCustomAlert('อัปโหลดไฟล์สำเร็จ!', 'แผนการจัดการเรียนรู้ PDF ถูกบันทึกเข้า Google Drive และลิงก์เข้ากับคิวการจองสำเร็จแล้ว', 'success');
+                        closeUploadPDFModal();
+                        loadAppData(); // รีโหลดข้อมูลทั้งหมดใหม่
                     } else {
-                        throw new Error(result.message || "เซิร์ฟเวอร์ปฏิเสธการจอง");
+                        showCustomAlert('เกิดข้อผิดพลาด', result.message || 'ไม่สามารถทำการบันทึกข้อมูลไฟล์ได้', 'error');
                     }
                 } catch (error) {
-                    console.error("Google Sheet API Write failed", error);
-                    openModal(
-                        "<i class='fa-solid fa-cloud-arrow-down text-amber-500 text-3xl'></i>", 
-                        "บันทึกลงคลาวด์ไม่สำเร็จ", 
-                        "ระบบทำการจองแบบออฟไลน์บนเครื่องท่านไว้เรียบร้อยแล้ว รายละเอียดข้อผิดพลาด: " + error.message, 
-                        "bg-amber-50 text-amber-600"
-                    );
-                    saveBookingToLocal(newBooking);
-                    showSuccessFlow();
+                    console.error('Error uploading PDF:', error);
+                    showCustomAlert('ระบบหลังบ้านขัดข้อง', 'ไม่สามารถเข้าถึงเซิร์ฟเวอร์ Google Apps Script ได้ กรุณาตรวจสอบสิทธิ์การตั้งค่า Web App', 'error');
                 }
             } else {
-                saveBookingToLocal(newBooking);
-                showSuccessFlow();
+                // อัปโหลดในโหมดจำลอง (Demo Mode)
+                const targetIdx = bookings.findIndex(b => b.id === activeUploadId);
+                if (targetIdx !== -1) {
+                    bookings[targetIdx].pdfName = modalPDFName;
+                    bookings[targetIdx].driveUrl = "https://drive.google.com/file/d/demo_uploaded_success";
+                    localStorage.setItem('local_bookings_v2', JSON.stringify(bookings));
+                    showCustomAlert('อัปโหลดสำเร็จ (โหมดจำลอง)', 'จำลองการอัปโหลดไฟล์แนบเข้าคิวจองในเครื่องนี้เรียบร้อยแล้ว', 'success');
+                    closeUploadPDFModal();
+                    renderBookingsTable();
+                }
+            }
+
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = originalBtnHTML;
+        }
+
+        // Form Submission Handler (ขั้นตอนการจองแบบไร้ไฟล์แนบ)
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            if (!selectedDate) {
+                showCustomAlert('ข้อมูลไม่ครบถ้วน', 'กรุณาเลือกวันที่ต้องการจัดกิจกรรมบนปฏิทินทางซ้ายมือก่อนค่ะ', 'error');
+                return;
+            }
+
+            if (!selectedPeriod) {
+                showCustomAlert('ข้อมูลไม่ครบถ้วน', 'กรุณาเลือกคาบเรียนที่ต้องการจองบนตารางเวลา', 'error');
+                return;
+            }
+
+            const teacher = document.getElementById('booking-teacher').value;
+            const subject = document.getElementById('booking-subject').value.trim();
+            const level = document.getElementById('booking-level').value;
+            const room = document.getElementById('booking-room').value.trim();
+
+            if (!teacher || !subject || !level || !room) {
+                showCustomAlert('ข้อมูลไม่ครบถ้วน', 'กรุณากรอกข้อมูลในช่องที่มีเครื่องหมายดอกจัน (*) ให้ครบถ้วน', 'error');
+                return;
+            }
+
+            const payload = {
+                date: selectedDate,
+                period: selectedPeriod,
+                teacher: teacher,
+                subject: subject,
+                level: level,
+                room: room
+            };
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalBtnHTML = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent inline-block mr-2"></span> กำลังประมวลผลการจอง...`;
+
+            if (configAppsScriptUrl) {
+                try {
+                    const response = await fetch(configAppsScriptUrl, {
+                        method: 'POST',
+                        redirect: 'follow',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8',
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showCustomAlert('จองคิวสำเร็จแล้ว!', `ลงทะเบียนคาบการนิเทศสำเร็จ กรุณาไปที่แท็บ "รายการจองทั้งหมด" เพื่อแนบไฟล์แผนการสอน PDF ต่อไปค่ะ`, 'success');
+                        resetForm();
+                        loadAppData(); 
+                        switchTab('list'); // นำทางผู้ใช้อัตโนมัติไปหน้าตารางเพื่อแนบไฟล์
+                    } else {
+                        showCustomAlert('ไม่สามารถทำการจองได้', result.message || 'ระบบหลังบ้านปฏิเสธคำขอการบันทึกข้อมูล', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error submitting data:', error);
+                    showCustomAlert('เซิร์ฟเวอร์ขัดข้อง', 'ไม่สามารถเชื่อมต่อ Google Apps Script ได้ กรุณาเช็คความถูกต้องของลิงก์ตั้งค่าระบบหลังบ้าน', 'error');
+                }
+            } else {
+                // บันทึกเฉพาะตารางแบบ Local Demo
+                const exists = bookings.find(b => b.date === selectedDate && b.period === selectedPeriod);
+                if (exists) {
+                    showCustomAlert('เวลาชนกัน', 'วันและคาบดังกล่าวได้รับการจองไปแล้ว กรุณาเลือกคาบเวลาใหม่อีกครั้ง', 'error');
+                } else {
+                    payload.id = Date.now().toString();
+                    payload.pdfName = "";
+                    payload.driveUrl = "";
+                    bookings.push(payload);
+                    localStorage.setItem('local_bookings_v2', JSON.stringify(bookings));
+                    showCustomAlert('บันทึกสำเร็จ (โหมดจำลอง)', 'บันทึกตารางการนิเทศในอุปกรณ์เรียบร้อยแล้ว กรุณากดปุ่มแนบแผนการสอนต่อในตารางแสดงผล', 'success');
+                    resetForm();
+                    renderCalendar();
+                    renderPeriodGrid();
+                    switchTab('list');
+                }
             }
 
             submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnHtml;
-        };
+            submitBtn.innerHTML = originalBtnHTML;
+        }
 
-        const saveBookingToLocal = (bookingObj) => {
-            appState.bookings.push(bookingObj);
-            localStorage.setItem('class_supervisions', JSON.stringify(appState.bookings));
-            updateTotalCount();
-        };
-
-        const showSuccessFlow = () => {
-            renderBookingsTable();
-            renderPeriodSlots();
-            appState.calendarInstance.redraw();
-
+        function resetForm() {
             document.getElementById('booking-form').reset();
-            document.getElementById('teacher-search').value = "";
-            renderTeachersDropdown(appState.teachers);
+            selectedPeriod = null;
+            updateSelectedLabels();
+            renderPeriodGrid();
+        }
 
-            document.getElementById('file-name-display').className = "text-xs text-emerald-600 font-bold mt-2 hidden";
-            document.getElementById('pdf-icon').className = "fa-solid fa-file-pdf text-3xl text-slate-400 mb-2";
-            appState.uploadedPdfBase64 = null;
-            appState.uploadedPdfName = null;
-
-            openModal(
-                "<i class='fa-solid fa-circle-check text-2xl'></i>",
-                "บันทึกประวัติสำเร็จเรียบร้อย",
-                "ทำรายการจัดสรรวัน-เวลาร่วมการนิเทศชั้นเรียนของท่านเข้าระบบเรียบร้อยแล้ว โดยแผนการเรียนรู้ของท่านถูกส่งและสร้างเป็นไฟล์ดาวน์โหลดจริงบน Google Drive เรียบร้อย",
-                "bg-emerald-50 text-emerald-600",
-                true
-            );
-        };
-
-        // ==========================================
-        // DATA TABLE RENDERING
-        // ==========================================
-
-        const renderBookingsTable = () => {
+        // Render List Tab Data
+        function renderBookingsTable(filteredData = null) {
             const tableBody = document.getElementById('bookings-table-body');
-            const emptyState = document.getElementById('table-empty-state');
-            const query = document.getElementById('search-bookings').value.toLowerCase();
-            
-            tableBody.innerHTML = '';
+            const emptyState = document.getElementById('empty-state');
+            tableBody.innerHTML = "";
 
-            const filtered = appState.bookings.filter(b => {
-                return b.teacherName.toLowerCase().includes(query) || 
-                       b.subject.toLowerCase().includes(query) || 
-                       b.classLevel.toLowerCase().includes(query) ||
-                       b.classroom.toLowerCase().includes(query) ||
-                       b.date.toLowerCase().includes(query);
-            });
+            const targetData = filteredData || bookings;
 
-            filtered.sort((a, b) => {
+            if (targetData.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            const sorted = [...targetData].sort((a, b) => {
                 if (a.date !== b.date) return a.date.localeCompare(b.date);
                 return a.period - b.period;
             });
 
-            if (filtered.length === 0) {
-                emptyState.className = "py-12 text-center text-slate-400 block";
-                return;
-            } else {
-                emptyState.className = "py-12 text-center text-slate-400 hidden";
-            }
-
-            filtered.forEach(b => {
+            sorted.forEach(b => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 border-b border-slate-100 transition-colors";
-                
-                const thaiDateDisplay = formatThaiDate(b.date);
-                const meta = PERIODS_METADATA[b.period] || { start: "N/A", end: "N/A" };
-                
-                // คอนโทรลป้ายสถานะส่งแผนหรือไม่ส่งแผนข้างหลังชื่อครูผู้สอน
-                let statusBadgeInName = "";
-                if (!b.pdfFileData || b.pdfFileData === "") {
-                    statusBadgeInName = `
-                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 ml-2" title="ยังไม่จัดส่งไฟล์แผนการจัดการเรียนรู้">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1 animate-pulse"></span> ยังไม่ส่งแผน
-                        </span>
-                    `;
-                } else {
-                    statusBadgeInName = `
-                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 ml-2" title="จัดส่งไฟล์แผนการสอนลงคลาวด์ไดรฟ์เรียบร้อยแล้ว">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1"></span> ส่งแผนแล้ว
-                        </span>
-                    `;
-                }
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
 
-                // คอนโทรลปุ่มแสดงไฟล์และการแนบย้อนหลังที่เด่นชัดในช่องคอลัมน์ "แผนการจัดเรียนรู้"
-                let fileLinkHtml = "";
-                if (b.pdfFileData && b.pdfFileData !== "") {
-                    if (b.pdfFileData === "dummy_base64_data") {
-                        fileLinkHtml = `
-                            <span class="inline-flex items-center space-x-1 text-xs text-slate-500 bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-200">
-                                <i class="fa-solid fa-paperclip"></i>
-                                <span class="max-w-[100px] truncate">ไฟล์ตัวอย่าง</span>
-                            </span>
-                        `;
-                    } else if (b.pdfFileData.startsWith("http")) {
-                        // ลิงก์ดาวน์โหลด Google Drive
-                        fileLinkHtml = `
-                            <a href="${b.pdfFileData}" target="_blank" class="inline-flex items-center space-x-1.5 text-xs text-indigo-700 hover:text-indigo-900 font-semibold bg-indigo-50 hover:bg-indigo-100/70 px-2.5 py-1.5 rounded-xl transition-colors border border-indigo-200">
-                                <i class="fa-solid fa-file-pdf text-red-500"></i>
-                                <span class="max-w-[110px] truncate">เปิดแผนบน Drive</span>
-                            </a>
-                        `;
-                    } else {
-                        // Base64 สำรองในเครื่อง
-                        fileLinkHtml = `
-                            <a href="${b.pdfFileData}" download="${b.pdfFileName}" class="inline-flex items-center space-x-1.5 text-xs text-indigo-700 hover:text-indigo-900 font-semibold bg-indigo-50 hover:bg-indigo-100/70 px-2.5 py-1.5 rounded-xl transition-colors border border-indigo-200">
-                                <i class="fa-solid fa-cloud-arrow-down"></i>
-                                <span class="max-w-[100px] truncate">${b.pdfFileName}</span>
-                            </a>
-                        `;
-                    }
+                const periodObj = periodTimes.find(pt => pt.period === b.period);
+                const timeString = periodObj ? periodObj.time : "";
+
+                // ลิงก์ PDF แผนการสอนบน Drive หากยังไม่มีแสดงปุ่มแนบไฟล์ย้อนหลัง
+                let pdfButtonHTML = "";
+                if (b.driveUrl && b.driveUrl.startsWith('http')) {
+                    pdfButtonHTML = `
+                        <a href="${b.driveUrl}" target="_blank" class="mx-auto text-teal-600 hover:text-teal-700 font-semibold flex items-center justify-center gap-1 bg-teal-50 px-2.5 py-1.5 rounded-lg border border-teal-100 text-[11px] transition">
+                            <i data-lucide="external-link" class="w-3.5 h-3.5"></i> เปิดดูบน Drive
+                        </a>
+                    `;
                 } else {
-                    fileLinkHtml = `
-                        <button onclick="openTableFileUpload('${b.id}')" title="คลิกเพื่ออัปโหลดไฟล์ PDF แผนการสอนเก็บลง Google Drive" class="inline-flex items-center space-x-1 text-xs text-amber-700 hover:text-amber-800 font-bold bg-amber-50 hover:bg-amber-100 border border-amber-200/50 px-3 py-2 rounded-xl transition-all shadow-sm">
-                            <i class="fa-solid fa-file-arrow-up animate-pulse"></i>
-                            <span>อัปโหลดแผน</span>
+                    pdfButtonHTML = `
+                        <button onclick="openUploadPDFModal('${b.id}', '${b.teacher}', '${b.subject}')" class="mx-auto text-amber-600 hover:text-amber-700 font-semibold flex items-center justify-center gap-1 bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-200/80 text-[11px] transition animate-pulse">
+                            <i data-lucide="paperclip" class="w-3.5 h-3.5"></i> แนบแผนการสอน
                         </button>
                     `;
                 }
 
-                tr.innerHTML = `
-                    <td class="py-4 px-4 font-bold text-slate-800 text-center whitespace-nowrap">${thaiDateDisplay}</td>
-                    <td class="py-4 px-4 text-center">
-                        <span class="block bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-full text-xs border border-indigo-100">
-                            คาบที่ ${b.period}
-                        </span>
-                        <span class="text-[10px] text-slate-400 block mt-1 font-medium">${meta.start} - ${meta.end} น.</span>
-                    </td>
-                    <td class="py-4 px-4 font-bold text-slate-900">
-                        <div class="flex items-center whitespace-nowrap">
-                            <span>${b.teacherName}</span>
-                            ${statusBadgeInName}
-                        </div>
-                    </td>
-                    <td class="py-4 px-4 text-slate-600 font-medium">${b.subject}</td>
-                    <td class="py-4 px-4 text-center whitespace-nowrap">
-                        <span class="block text-slate-800 font-bold">${b.classLevel}</span>
-                        <span class="text-[10px] text-slate-400 block">${b.classroom}</span>
-                    </td>
-                    <td class="py-4 px-4 text-center whitespace-nowrap">${fileLinkHtml}</td>
-                    <td class="py-4 px-4 text-center whitespace-nowrap">
-                        <div class="flex items-center justify-center space-x-1">
-                            <button onclick="triggerPrintReceipt('${b.id}')" title="พิมพ์ใบยืนยัน" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors">
-                                <i class="fa-solid fa-print"></i>
-                            </button>
-                            <button onclick="triggerDeleteBooking('${b.id}')" title="ยกเลิกการจอง" class="p-2 text-rose-600 hover:bg-rose-50 rounded-xl transition-colors">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
-                    </td>
+                const deleteButtonHTML = `
+                    <button onclick="deleteBooking('${b.id}', '${b.date}', ${b.period})" class="text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition" title="ยกเลิกการจอง">
+                        <i data-lucide="trash-2" class="w-4 h-4 mx-auto"></i>
+                    </button>
                 `;
+
+                tr.innerHTML = `
+                    <td class="p-4 font-semibold text-slate-800">${thaiFormatDate(b.date)}</td>
+                    <td class="p-4">
+                        <span class="block font-bold text-slate-700">คาบที่ ${b.period}</span>
+                        <span class="text-[10px] text-slate-400 font-mono">${timeString}</span>
+                    </td>
+                    <td class="p-4 font-bold text-slate-700 cursor-pointer hover:text-teal-600 hover:underline" onclick="openUploadPDFModal('${b.id}', '${b.teacher}', '${b.subject}')">
+                        <span class="flex items-center gap-1">
+                            <i data-lucide="user-cog" class="w-3.5 h-3.5 text-slate-400"></i> ${b.teacher}
+                        </span>
+                    </td>
+                    <td class="p-4">${b.subject}</td>
+                    <td class="p-4 font-bold text-teal-600">${b.level}</td>
+                    <td class="p-4 text-slate-500">${b.room}</td>
+                    <td class="p-4 text-center">${pdfButtonHTML}</td>
+                    <td class="p-4 text-center">${deleteButtonHTML}</td>
+                `;
+
                 tableBody.appendChild(tr);
             });
-        };
 
-        // ==========================================
-        // ACTION: RECEIPT PRINTING WORKFLOW
-        // ==========================================
-        
-        let lastSelectedBookingForReceipt = null;
+            lucide.createIcons();
+        }
 
-        const triggerPrintReceipt = (id) => {
-            const booking = appState.bookings.find(b => b.id === id);
-            if (booking) {
-                lastSelectedBookingForReceipt = booking;
-                printReceipt();
-            }
-        };
-
-        const printReceipt = () => {
-            if (!lastSelectedBookingForReceipt) return;
-            
-            const b = lastSelectedBookingForReceipt;
-            const meta = PERIODS_METADATA[b.period] || { start: "N/A", end: "N/A" };
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>ใบบันทึกยืนยันการจองเวลานิเทศการสอน</title>
-                    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-                    <style>
-                        body { font-family: 'Sarabun', sans-serif; padding: 40px; color: #333; line-height: 1.6; }
-                        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
-                        .logo { font-size: 28px; font-weight: bold; color: #1e3a8a; }
-                        .title { font-size: 20px; font-weight: bold; margin-top: 10px; }
-                        .content { margin-bottom: 40px; }
-                        .row { display: flex; margin-bottom: 12px; font-size: 16px; }
-                        .label { width: 220px; font-weight: bold; color: #555; }
-                        .value { flex-grow: 1; border-bottom: 1px dotted #ccc; padding-bottom: 2px; }
-                        .footer { text-align: center; font-size: 12px; color: #777; margin-top: 50px; border-top: 1px solid #eee; padding-top: 15px; }
-                        .stamp { display: flex; justify-content: space-around; margin-top: 50px; }
-                        .stamp-box { text-align: center; width: 200px; }
-                        .stamp-line { border-bottom: 1px solid #000; margin-top: 40px; margin-bottom: 10px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <div class="logo">🏫 ใบรายงานยืนยันการจองนิเทศ</div>
-                        <div class="title">กลุ่มงานนิเทศและพัฒนาการเรียนรู้ ฝ่ายวิชาการ</div>
-                    </div>
-                    <div class="content">
-                        <div class="row">
-                            <div class="label">ผู้ขอรับการนิเทศ (ครูผู้สอน):</div>
-                            <div class="value">${b.teacherName}</div>
-                        </div>
-                        <div class="row">
-                            <div class="label">กลุ่มสาระการเรียนรู้ / วิชา:</div>
-                            <div class="value">${b.subject}</div>
-                        </div>
-                        <div class="row">
-                            <div class="label">ระดับชั้นเรียน:</div>
-                            <div class="value">${b.classLevel}</div>
-                        </div>
-                        <div class="row">
-                            <div class="label">ห้องเรียนที่นิเทศ:</div>
-                            <div class="value">${b.classroom}</div>
-                        </div>
-                        <div class="row">
-                            <div class="label">วันที่นัดหมายนิเทศ:</div>
-                            <div class="value">${formatThaiDate(b.date)}</div>
-                        </div>
-                        <div class="row">
-                            <div class="label">คาบและช่วงเวลาเรียน:</div>
-                            <div class="value">คาบที่ ${b.period} (เวลา ${meta.start} - ${meta.end} น.)</div>
-                        </div>
-                        <div class="row">
-                            <div class="label">ลิงก์เอกสารแผนบน Google Drive:</div>
-                            <div class="value" style="font-size: 11px;">${b.pdfFileData.startsWith("http") ? b.pdfFileData : (b.pdfFileName ? "มีแผนการสอนแต่ทำงานโหมดออฟไลน์" : "ยังไม่ได้แนบเอกสาร (สามารถแนบภายหลังได้)")}</div>
-                        </div>
-                        <div class="row">
-                            <div class="label">ทำรายการจองสำเร็จเมื่อ:</div>
-                            <div class="value">${b.timestamp}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="stamp">
-                        <div class="stamp-box">
-                            <div class="stamp-line"></div>
-                            <div>(ลงชื่อ)......................................................</div>
-                            <div style="margin-top: 5px;">ผู้ขอรับการนิเทศ</div>
-                        </div>
-                        <div class="stamp-box">
-                            <div class="stamp-line"></div>
-                            <div>(ลงชื่อ)......................................................</div>
-                            <div style="margin-top: 5px;">ผู้นิเทศการศึกษา</div>
-                        </div>
-                    </div>
-
-                    <div class="footer">
-                        <p>กรุณาพิมพ์เอกสารใบนี้และแนบแผนการสอนยื่นต่อฝ่ายงานวิชาการ เพื่อเตรียมรับการตรวจนิเทศการจัดกิจกรรมการเรียนรู้</p>
-                    </div>
-                    <script>
-                        window.onload = function() { window.print(); }
-                    <\/script>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-        };
-
-        // ==========================================
-        // ACTION: DELETE BOOKING
-        // ==========================================
-
-        const triggerDeleteBooking = (id) => {
-            appState.toDeleteId = id;
-            document.getElementById('confirm-modal').classList.remove('hidden');
-        };
-
-        const closeConfirmModal = () => {
-            document.getElementById('confirm-modal').classList.add('hidden');
-            appState.toDeleteId = null;
-        };
-
-        document.getElementById('confirm-delete-btn').addEventListener('click', () => {
-            if (appState.toDeleteId) {
-                appState.bookings = appState.bookings.filter(b => b.id !== appState.toDeleteId);
-                localStorage.setItem('class_supervisions', JSON.stringify(appState.bookings));
-                
-                updateTotalCount();
+        // Search Filter function
+        function filterBookings() {
+            const searchVal = document.getElementById('booking-search').value.toLowerCase().trim();
+            if (!searchVal) {
                 renderBookingsTable();
-                renderPeriodSlots();
-                appState.calendarInstance.redraw();
+                return;
+            }
 
-                closeConfirmModal();
-                openModal(
-                    "<i class='fa-solid fa-trash-arrow-up text-rose-500 text-3xl'></i>",
-                    "ยกเลิกการจองนิเทศแล้ว",
-                    "ระบบทำการปลดล็อกวันและคาบดังกล่าวเรียบร้อยเพื่อให้ครูท่านอื่นจองเวลาเรียนแทนได้",
-                    "bg-rose-50 text-rose-600"
+            const filtered = bookings.filter(b => {
+                return (
+                    b.teacher.toLowerCase().includes(searchVal) ||
+                    b.subject.toLowerCase().includes(searchVal) ||
+                    b.level.toLowerCase().includes(searchVal) ||
+                    b.room.toLowerCase().includes(searchVal) ||
+                    thaiFormatDate(b.date).toLowerCase().includes(searchVal)
                 );
-            }
-        });
+            });
 
-        // ==========================================
-        // AUXILIARY & UI UTILITIES
-        // ==========================================
+            renderBookingsTable(filtered);
+        }
 
-        const scrollToSection = (id) => {
-            const el = document.getElementById(id);
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-        };
-
-        const openModal = (iconHtml, title, message, iconBgClass = "bg-indigo-50 text-indigo-600", showAction = false) => {
-            const modal = document.getElementById('custom-modal');
-            const iconContainer = document.getElementById('modal-icon-container');
-            const modalTitle = document.getElementById('modal-title');
-            const modalMsg = document.getElementById('modal-message');
-            const modalBtnAction = document.getElementById('modal-btn-action');
-
-            iconContainer.innerHTML = iconHtml;
-            iconContainer.className = `mx-auto flex items-center justify-center h-16 w-16 rounded-full ${iconBgClass} mb-4`;
-            
-            modalTitle.innerText = title;
-            modalMsg.innerText = message;
-
-            if (showAction) {
-                if (appState.bookings.length > 0) {
-                    lastSelectedBookingForReceipt = appState.bookings[appState.bookings.length - 1];
-                }
-                modalBtnAction.classList.remove('hidden');
-            } else {
-                modalBtnAction.classList.add('hidden');
+        // Delete Booking Handler
+        function deleteBooking(id, date, period) {
+            if (configAppsScriptUrl) {
+                showCustomAlert('ระบบคิวหลักป้องกัน', 'เพื่อความปลอดภัยของสารสนเทศหลัก กรุณาจัดการยกเลิกหรือนำข้อมูลออกที่ระบบหลังบ้านของ Google Sheet โดยตรงค่ะ', 'error');
+                return;
             }
 
-            modal.classList.remove('hidden');
-        };
-
-        const closeModal = () => {
-            document.getElementById('custom-modal').classList.add('hidden');
-        };
-
-        // ==========================================
-        // INITIALIZATION
-        // ==========================================
-        
-        window.onload = function() {
-            generateClassLevels();
-            populatePeriodFormOptions();
-            loadInitialData();
-            initCalendar();
-            renderBookingsTable();
-
-            // Auto ping/sync if Google Sheet configured
-            if (GOOGLE_SHEET_API_URL && GOOGLE_SHEET_API_URL !== "") {
-                syncDataFromGoogleSheet();
+            if (confirm(`คุณต้องการยืนยันการยกเลิกจอง คาบที่ ${period} ของวันที่ ${thaiFormatDate(date)} ใช่หรือไม่?`)) {
+                bookings = bookings.filter(b => b.id !== id);
+                localStorage.setItem('local_bookings_v2', JSON.stringify(bookings));
+                showCustomAlert('ยกเลิกรายการแล้ว', 'ลบประวัติการจองจากคอมพิวเตอร์เครื่องนี้เรียบร้อยแล้ว', 'success');
+                renderBookingsTable();
+                renderCalendar();
+                renderPeriodGrid();
             }
-        };
+        }
 
+        // Utility Helpers for Dates
+        function formatDateToString(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function thaiFormatDate(dateStr) {
+            const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const y = parseInt(parts[0]) + 543; // Convert to BE Year
+            const m = months[parseInt(parts[1]) - 1];
+            const d = parseInt(parts[2]);
+            return `${d} ${m} ${y}`;
+        }
     </script>
 </body>
 </html>
