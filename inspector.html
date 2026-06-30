@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบให้คะแนนการนิเทศอัจฉริยะ (Supervision Scoring System)</title>
+    <!-- Tailwind CSS (Cleaned Links) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons (Cleaned Links) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Cleaned Links) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -163,7 +166,8 @@
                     </div>
 
                     <div class="overflow-y-auto max-h-[400px] pr-2 space-y-3" id="bookings-container">
-                        </div>
+                        <!-- Bookings populate dynamically -->
+                    </div>
 
                     <div id="selection-summary-bar" class="hidden mt-6 p-4 bg-slate-900 text-white rounded-xl flex flex-col sm:flex-row justify-between items-center gap-4 animate-fade-in">
                         <div class="flex items-center gap-3">
@@ -418,14 +422,13 @@
             }
         }
 
-        // ตัวแกะข้อมูล (Fuzzy Column Matcher) ปรับปรุงให้ยืดหยุ่นต่อชื่อคอลัมน์ทุกรูปแบบและไม่คัดทิ้งผิดพลาด
+        // ตัวแกะข้อมูล (Fuzzy Column Matcher) ปรับปรุงให้ยืดหยุ่นและป้องกันการกรองรายชื่อที่มีคำว่า "ไม่ระบุชื่อ" หลุดไป
         function cleanParsedData(rawData, type) {
             if (!rawData || !Array.isArray(rawData)) return [];
             
             if (type === 'inspector') {
                 return rawData.map((item, i) => {
                     const keys = Object.keys(item);
-                    // ค้นหาคีย์ที่มีคำระบุตัวตนกรรมการ
                     const nameKey = keys.find(k => 
                         k.includes('ชื่อ') || 
                         k.toLowerCase().includes('name') || 
@@ -448,7 +451,6 @@
                 return rawData.map((item, i) => {
                     const keys = Object.keys(item);
                     
-                    // ปรับแต่งการตรวจหาชื่อผู้รับการตรวจให้ครอบคลุม และไม่ลบ "ไม่ระบุชื่อ" ในขั้นตอนการจับคู่แรกสุด
                     const nameKey = keys.find(k => 
                         k.includes('ชื่อ') || 
                         k.includes('ผู้รับ') || 
@@ -496,27 +498,38 @@
                         k.includes('ชั่วโมง')
                     );
 
+                    const evaluatorKey = keys.find(k => 
+                        k.includes('ผู้ประเมิน') || 
+                        k.includes('กรรมการ') || 
+                        k.toLowerCase().includes('evaluator') || 
+                        k.toLowerCase().includes('inspector')
+                    );
+
+                    const targetNameVal = item[nameKey] ? item[nameKey].toString().trim() : '';
+
                     return {
                         id: item.id || `book-${i}`,
-                        targetName: item[nameKey] ? item[nameKey].toString().trim() : 'ไม่ระบุชื่อ',
+                        targetName: targetNameVal || 'ไม่ระบุชื่อ',
                         schoolName: item[schoolKey] ? item[schoolKey].toString().trim() : 'ไม่ระบุโรงเรียน',
                         date: item[dateKey] ? item[dateKey].toString().trim() : '',
                         topic: item[topicKey] ? item[topicKey].toString().trim() : '',
                         status: item['สถานะ'] || item['status'] || 'รอรับการประเมิน',
                         lessonPlanUrl: planKey ? (item[planKey] ? item[planKey].toString().trim() : '') : '',
-                        period: periodKey ? (item[periodKey] ? item[periodKey].toString().trim() : '') : ''
+                        period: periodKey ? (item[periodKey] ? item[periodKey].toString().trim() : '') : '',
+                        evaluatorName: evaluatorKey ? (item[evaluatorKey] ? item[evaluatorKey].toString().trim() : '') : ''
                     };
                 }).filter(b => {
-                    // กรองเฉพาะแถวที่เป็นหัวตารางซ้ำ หรือว่างเปล่าจริงๆ เท่านั้น
                     if (!b.targetName) return false;
                     const t = b.targetName.trim();
-                    return t !== "" && 
-                           t !== "ชื่อ" && 
-                           t !== "ชื่อ-นามสกุล" && 
-                           t !== "ชื่อผู้รับการประเมิน" && 
-                           t !== "ชื่อผู้รับการนิเทศ" && 
-                           t !== "Name" && 
-                           t !== "ไม่ระบุชื่อ";
+                    if (t === "") return false;
+                    
+                    const isHeader = t === "ชื่อ" || 
+                                     t === "ชื่อ-นามสกุล" || 
+                                     t === "ชื่อผู้รับการประเมิน" || 
+                                     t === "ชื่อผู้รับการนิเทศ" || 
+                                     t === "Name" || 
+                                     t === "ชื่อ - นามสกุล ผู้รับการนิเทศ";
+                    return !isHeader;
                 });
             }
             return rawData;
@@ -526,7 +539,7 @@
             state.inspectors = [{ id: "I1", name: "ดร.สัญชัย รัตนภาคี" }];
             state.bookings = [
                 { id: "B1", targetName: "นายวิโรจน์ แงอรุณ", schoolName: "โรงเรียนบ้านนาดี", date: "2026-06-30", topic: "Active Learning", status: "รอรับการประเมิน", lessonPlanUrl: "https://unec.edu.az/application/uploads/2014/12/pdf-sample.pdf", period: "1" },
-                { id: "B2", targetName: "นางสาวมณีรัตน์ วงศ์เทวา", schoolName: "โรงเรียนอนุบาลสุโขทัย", date: "2026-06-30", topic: "การสร้างสื่อนวัตกรรม", status: "ประเมินเสร็จสมบูรณ์", lessonPlanUrl: "", period: "3" }
+                { id: "B2", targetName: "นางสาวมณีรัตน์ วงศ์เทวา", schoolName: "โรงเรียนอนุบาลสุโขทัย", date: "2026-06-30", topic: "การสร้างสื่อนวัตกรรม", status: "ประเมินเสร็จสมบูรณ์", lessonPlanUrl: "", period: "3", evaluatorName: "ดร.สัญชัย รัตนภาคี" }
             ];
         }
 
@@ -550,7 +563,6 @@
             
             const filtered = state.bookings.filter(b => b.targetName.toLowerCase().includes(filterQuery.toLowerCase()));
             
-            // แสดงสถานะกรณีไม่มีคิวการจองเลย
             if (filtered.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-10 border border-dashed border-slate-200 rounded-xl">
@@ -577,9 +589,15 @@
                             <h4 class="font-semibold text-slate-800 font-kanit">${b.targetName}</h4>
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isDone ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${b.status}</span>
                         </div>
-                        <p class="text-xs text-slate-500">${b.schoolName} | วิชา: ${b.topic}</p>
+                        <p class="text-xs text-slate-500 mt-1">${b.schoolName} | วิชา: ${b.topic}</p>
+                        ${isDone && b.evaluatorName ? `
+                            <p class="text-[11px] text-emerald-700 font-medium mt-1.5 flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 w-fit">
+                                <i class="fa-solid fa-user-check text-[10px]"></i>
+                                <span>ผู้ประเมิน: ${b.evaluatorName}</span>
+                            </p>
+                        ` : ''}
                     </div>
-                    <div class="w-7 h-7 rounded-full flex items-center justify-center ${isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}">
+                    <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}">
                         <i class="fa-solid ${isSelected ? 'fa-check' : 'fa-chevron-right'} text-xs"></i>
                     </div>
                 `;
@@ -678,6 +696,7 @@
 
         function rateQuestion(id, val) { state.scores[id] = val; renderQuestionsForm(); updateLiveScoreDashboard(); }
 
+        // คำนวณสรุปคะแนนเรียลไทม์
         function updateLiveScoreDashboard() {
             const total = state.questions.length;
             const answered = Object.keys(state.scores).length;
